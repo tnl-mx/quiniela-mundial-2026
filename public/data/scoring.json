@@ -1,0 +1,7 @@
+{
+  "match": { "outcome": 1, "goalDiff": 2, "exactScore": 3 },
+  "groups": { "advances": 2, "exactPosition": 3 },
+  "knockout": { "winner": 2, "exactScore": 3 },
+  "penalties": { "wentToPens": 1, "winner": 2, "exactPens": 3 },
+  "awards": { "champion": 5, "finalists": 4, "fifaAward": 4 }
+}
