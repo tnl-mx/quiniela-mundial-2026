@@ -160,6 +160,7 @@
 
 .lb-th__icon {
   font-size: 0.85em;
+  line-height: 1; /* misma altura de caja para los 4 iconos (alinea titulos) */
   opacity: 0.7;
 }
 
@@ -284,6 +285,7 @@
 
 /* ---------- Bloque principal (nombre + pills) ---------- */
 .lb-main {
+  position: relative; /* ancla el tooltip del campeon dentro de esta columna */
   min-width: 0; /* permite truncar el nombre sin desbordar */
 }
 
@@ -341,6 +343,78 @@
     display: none;
   }
 }
+
+/* ---------- Pill/chip del CAMPEON elegido (prediccion, no puntos) ---------- */
+.lb-champ {
+  position: static; /* el tooltip se ancla a .lb-main (evita desbordes) */
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-brand-dark);
+  background: var(--color-brand-tint);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  padding: 3px 10px;
+  cursor: help;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.lb-champ:hover {
+  border-color: var(--color-brand);
+}
+
+/* Tooltip: anclado a .lb-main, acotado a su ancho -> nunca provoca scroll. */
+.lb-champ__tip {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 30;
+  width: max-content;
+  max-width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-text);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-align: left;
+  line-height: 1.4;
+  white-space: normal;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-2px);
+  transition: opacity 0.12s ease, transform 0.12s ease, visibility 0.12s;
+}
+
+.lb-champ:hover .lb-champ__tip,
+.lb-champ:focus .lb-champ__tip,
+.lb-champ:focus-visible .lb-champ__tip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Variante CHIP: solo DESKTOP, debajo del nombre (alineada con el nombre). */
+.lb-champ--chip {
+  display: none;
+}
+
+@media (min-width: 760px) {
+  .lb-champ--chip {
+    display: inline-flex;
+    margin-top: 5px;
+    margin-left: calc(1.75rem + var(--space-2));
+  }
+}
+
+/* Variante PILL: vive dentro de .lb-pills (solo MOVIL, ya que .lb-pills se
+   oculta en desktop). Se distingue de las pills de numeros por su color tint. */
 
 /* ---------- Celdas numericas de desglose (solo DESKTOP) ---------- */
 .lb-num {

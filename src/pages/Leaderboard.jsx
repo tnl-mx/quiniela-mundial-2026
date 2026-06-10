@@ -19,6 +19,12 @@ import { PersonDetail } from './PersonDetail.jsx'
 
 // Categorias del desglose: icono, etiquetas y el texto de ayuda del popover.
 // Las claves coinciden con `cols` que arma useLeaderboard.
+// Orden: fase de grupos primero (Partidos, Grupos), luego eliminatoria
+// (Avance) y Campeón. Este orden se aplica solo: encabezados desktop, pills
+// movil y leyenda mapean sobre este mismo array.
+// Nota: el icono de Avance usa la variante emoji (⬆️, con selector U+FE0F)
+// para que se renderice como emoji ARRIBA del texto, igual que ⚽ 📊 👑 (y no
+// como flecha de texto chica que descuadraba el encabezado).
 const CATEGORIES = [
   {
     key: 'partidos',
@@ -28,18 +34,18 @@ const CATEGORIES = [
     help: 'Puntos por acertar el resultado o el marcador exacto de los partidos (grupos y eliminatoria).',
   },
   {
-    key: 'avance',
-    icon: '⬆',
-    short: 'Av',
-    long: 'Avance',
-    help: 'Puntos por atinar qué equipos avanzan en cada ronda de la eliminatoria.',
-  },
-  {
     key: 'grupos',
     icon: '📊',
     short: 'Gru',
     long: 'Grupos',
     help: 'Puntos por la clasificación y la posición final de los equipos en cada grupo.',
+  },
+  {
+    key: 'avance',
+    icon: '⬆️',
+    short: 'Av',
+    long: 'Avance',
+    help: 'Puntos por atinar qué equipos avanzan en cada ronda de la eliminatoria.',
   },
   {
     key: 'campeon',
@@ -49,6 +55,28 @@ const CATEGORIES = [
     help: 'Puntos por acertar al campeón del Mundial.',
   },
 ]
+
+// Pill/chip que muestra el CAMPEON que ELIGIO la persona en su quiniela (su
+// prediccion, no los puntos). Es un boton para que en movil se pueda TOCAR y
+// ver el popover; stopPropagation evita que el toque abra el detalle de la fila.
+function ChampionPick({ teams, code, className }) {
+  if (!code) return null
+  const flag = teams?.[code]?.flag ?? '🏳'
+  const stop = (e) => e.stopPropagation()
+  return (
+    <button
+      type="button"
+      className={`lb-champ ${className}`}
+      onClick={stop}
+      title="Campeón que eligió esta persona en su quiniela"
+    >
+      <span aria-hidden="true">👑 {flag}</span> {code}
+      <span className="lb-champ__tip" role="tooltip">
+        Campeón que eligió esta persona en su quiniela
+      </span>
+    </button>
+  )
+}
 
 function initials(name) {
   return name
@@ -82,7 +110,7 @@ function StatCard({ tag, name, detail }) {
   )
 }
 
-function Row({ row, position, onSelect }) {
+function Row({ row, position, teams, onSelect }) {
   const medalClass =
     position === 1 ? 'is-gold' : position === 2 ? 'is-silver' : position === 3 ? 'is-bronze' : ''
 
@@ -94,6 +122,8 @@ function Row({ row, position, onSelect }) {
       open()
     }
   }
+
+  const championPick = row.prediction?.champion ?? null
 
   return (
     <div
@@ -111,6 +141,8 @@ function Row({ row, position, onSelect }) {
           <span className="lb-avatar" aria-hidden="true">{initials(row.name)}</span>
           <span className="lb-name">{row.name}</span>
         </div>
+        {/* DESKTOP: chip del campeon elegido, debajo del nombre (no es columna). */}
+        <ChampionPick teams={teams} code={championPick} className="lb-champ--chip" />
         {/* Desglose para MOVIL: pills bajo el nombre (ocultas en desktop) */}
         <div className="lb-pills">
           {CATEGORIES.map((c) => (
@@ -118,6 +150,8 @@ function Row({ row, position, onSelect }) {
               <span aria-hidden="true">{c.icon}</span> {c.short} {row.cols[c.key]}
             </span>
           ))}
+          {/* MOVIL: una pill mas con el campeon elegido (su prediccion). */}
+          <ChampionPick teams={teams} code={championPick} className="lb-champ--pill" />
         </div>
       </div>
 
@@ -244,7 +278,7 @@ export function Leaderboard({ tournamentId }) {
               />
               {phase === 'knockout' && (
                 <StatCard
-                  tag="⬆ Rey de la eliminatoria"
+                  tag="⬆️ Rey de la eliminatoria"
                   name={maxBy(rows, knockoutPoints).name}
                   detail={`${knockoutPoints(maxBy(rows, knockoutPoints))} pts de eliminatoria`}
                 />
@@ -275,7 +309,13 @@ export function Leaderboard({ tournamentId }) {
             </div>
 
             {rows.map((row, i) => (
-              <Row key={row.file} row={row} position={i + 1} onSelect={(r) => setSelectedFile(r.file)} />
+              <Row
+                key={row.file}
+                row={row}
+                position={i + 1}
+                teams={teams}
+                onSelect={(r) => setSelectedFile(r.file)}
+              />
             ))}
           </section>
 
