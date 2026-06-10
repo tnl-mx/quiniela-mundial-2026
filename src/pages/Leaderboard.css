@@ -112,13 +112,13 @@
   padding: var(--space-3) var(--space-4);
 }
 
-/* DESKTOP: 7 columnas. Mas column-gap (24px) para que los encabezados
-   PARTIDOS / AVANCE / GRUPOS / CAMPEON respiren y no se peguen. Anchos
-   ajustados para que NUNCA haya scroll horizontal a 760px. */
+/* DESKTOP: 7 columnas. column-gap amplio (30px) para que los encabezados
+   PARTIDOS / AVANCE / GRUPOS / CAMPEON respiren y no se peguen entre si.
+   Anchos ajustados para que NUNCA haya scroll horizontal a 760px. */
 @media (min-width: 760px) {
   .lb-grid {
-    grid-template-columns: 2.25rem minmax(130px, 1fr) repeat(4, 4.5rem) 5rem;
-    column-gap: var(--space-5);
+    grid-template-columns: 2.25rem minmax(110px, 1fr) repeat(4, 4.5rem) 4.75rem;
+    column-gap: 30px;
     row-gap: var(--space-2);
   }
 }
@@ -169,20 +169,23 @@
 @media (min-width: 760px) {
   .lb-th {
     flex-direction: column;
-    align-items: flex-end;
-    gap: 2px;
+    align-items: center; /* centrado en su columna: mas aire entre vecinos */
+    justify-content: center;
+    gap: 4px; /* respiro entre icono y texto */
     line-height: 1.1;
+    width: 100%;
+    text-align: center;
   }
   .lb-th__icon {
-    font-size: 1.05em;
+    font-size: 1.1em;
   }
   .lb-th__label {
     white-space: nowrap;
   }
-  /* Un poco mas de alto en la cabecera para que respire la fila de dos lineas. */
+  /* Mas alto en la cabecera para que respire la fila de dos lineas. */
   .lb-head.lb-grid {
-    padding-top: var(--space-3);
-    padding-bottom: var(--space-3);
+    padding-top: var(--space-4);
+    padding-bottom: var(--space-4);
   }
 }
 
@@ -316,8 +319,8 @@
 .lb-pills {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 6px;
+  gap: 7px; /* mas aire entre pills (horizontal y vertical al envolver) */
+  margin-top: 9px;
   padding-left: calc(1.75rem + var(--space-2)); /* alineadas con el nombre */
 }
 
@@ -328,7 +331,7 @@
   background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
-  padding: 1px 8px;
+  padding: 3px 10px; /* mas respiro vertical y horizontal dentro de cada pill */
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
@@ -354,6 +357,9 @@
 @media (min-width: 760px) {
   .lb-cell {
     display: block;
+    /* Centrado bajo su encabezado (que tambien va centrado): mas aireado que
+       pegado a la derecha. La columna TOTAL sigue alineada a la derecha. */
+    text-align: center;
   }
 }
 
