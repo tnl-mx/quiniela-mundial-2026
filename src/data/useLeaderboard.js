@@ -10,6 +10,7 @@ import {
   loadPrediction,
 } from './loaders.js'
 import { scorePrediction } from '../logic/scoring.js'
+import { cropRealResults, maxPlayedMatch } from '../logic/matchOrder.js'
 
 // Hook que arma el leaderboard de UN torneo (parametrizado por tournamentId):
 //   1) lee la config de torneos y resuelve la carpeta de quinielas del torneo
@@ -72,6 +73,9 @@ export function useLeaderboard({ tournamentId } = {}) {
     tournament: null,
     teams: null,
     realResults: null,
+    // Para la grafica de evolucion (reconstruye rankings sobre crops).
+    scoring: null,
+    annexCOptions: null,
   })
 
   useEffect(() => {
@@ -149,6 +153,38 @@ export function useLeaderboard({ tournamentId } = {}) {
       ).length
       const phase = koPlayed > 0 ? 'knockout' : groupPlayed > 0 ? 'groups' : 'pre'
 
+      // 6) Flechas subio/bajo: posicion actual vs ranking "hace 4 partidos"
+      //    (resultados recortados a matchNumber = N_actual - 4). Se reusa el
+      //    mismo motor sobre un real-results recortado. Sin datos previos
+      //    suficientes (N_prev < 1), no hay flecha (row.delta = null).
+      const maxPlayed = maxPlayedMatch(realResults)
+      const nPrev = maxPlayed - 4
+      if (nPrev >= 1) {
+        const croppedPrev = cropRealResults(realResults, nPrev)
+        const prev = rows.map((r) => ({
+          file: r.file,
+          name: r.name,
+          total: scorePrediction({
+            prediction: r.prediction,
+            realResults: croppedPrev,
+            tournament,
+            teams,
+            annexCOptions,
+            scoring,
+          }).total,
+        }))
+        prev.sort((a, b) => b.total - a.total || a.name.localeCompare(b.name))
+        const prevPos = new Map(prev.map((r, i) => [r.file, i + 1]))
+        // delta > 0 = subio (estaba mas abajo antes); < 0 = bajo.
+        rows.forEach((r, i) => {
+          r.delta = prevPos.get(r.file) - (i + 1)
+        })
+      } else {
+        rows.forEach((r) => {
+          r.delta = null
+        })
+      }
+
       if (!cancelled) {
         setState({
           loading: false,
@@ -161,6 +197,9 @@ export function useLeaderboard({ tournamentId } = {}) {
           tournament,
           teams,
           realResults,
+          // Para la grafica de evolucion (reconstruye rankings recortando).
+          scoring,
+          annexCOptions,
         })
       }
     }

@@ -16,15 +16,25 @@ import { useState } from 'react'
 import './Leaderboard.css'
 import { useLeaderboard } from '../data/useLeaderboard.js'
 import { PersonDetail } from './PersonDetail.jsx'
+import { EvolutionChart } from './EvolutionChart.jsx'
+
+// Indicador de subio/bajo respecto a hace 4 partidos.
+function DeltaIndicator({ delta }) {
+  if (delta == null) return null
+  if (delta > 0) return <span className="lb-delta lb-delta--up" title={`Subió ${delta}`}>▲{delta}</span>
+  if (delta < 0) return <span className="lb-delta lb-delta--down" title={`Bajó ${-delta}`}>▼{-delta}</span>
+  return <span className="lb-delta lb-delta--same" title="Sin cambio">–</span>
+}
 
 // Categorias del desglose: icono, etiquetas y el texto de ayuda del popover.
 // Las claves coinciden con `cols` que arma useLeaderboard.
 // Orden: fase de grupos primero (Partidos, Grupos), luego eliminatoria
 // (Avance) y Campeón. Este orden se aplica solo: encabezados desktop, pills
 // movil y leyenda mapean sobre este mismo array.
-// Nota: el icono de Avance usa la variante emoji (⬆️, con selector U+FE0F)
-// para que se renderice como emoji ARRIBA del texto, igual que ⚽ 📊 👑 (y no
-// como flecha de texto chica que descuadraba el encabezado).
+// Nota: el icono de Avance usa 🔼 (U+1F53C), un emoji de UN solo code point con
+// presentacion emoji garantizada, igual que ⚽ 📊 👑. La flecha ⬆/⬆️ (U+2B06,
+// dingbat) se renderiza inconsistente (a veces como texto chico) y descuadraba
+// el encabezado; 🔼 se apila ARRIBA del texto idéntico a los otros tres.
 const CATEGORIES = [
   {
     key: 'partidos',
@@ -42,7 +52,7 @@ const CATEGORIES = [
   },
   {
     key: 'avance',
-    icon: '⬆️',
+    icon: '🔼',
     short: 'Av',
     long: 'Avance',
     help: 'Puntos por atinar qué equipos avanzan en cada ronda de la eliminatoria.',
@@ -134,7 +144,10 @@ function Row({ row, position, teams, onSelect }) {
       onClick={open}
       onKeyDown={onKey}
     >
-      <div className={`lb-rank ${medalClass}`}>{position}</div>
+      <div className="lb-rankcell">
+        <div className={`lb-rank ${medalClass}`}>{position}</div>
+        <DeltaIndicator delta={row.delta} />
+      </div>
 
       <div className="lb-main">
         <div className="lb-name-line">
@@ -196,6 +209,8 @@ export function Leaderboard({ tournamentId }) {
     tournament,
     teams,
     realResults,
+    scoring,
+    annexCOptions,
   } = useLeaderboard({ tournamentId })
 
   // Navegacion al detalle por persona (estado interno, sin ruteo de URL).
@@ -278,7 +293,7 @@ export function Leaderboard({ tournamentId }) {
               />
               {phase === 'knockout' && (
                 <StatCard
-                  tag="⬆️ Rey de la eliminatoria"
+                  tag="🔼 Rey de la eliminatoria"
                   name={maxBy(rows, knockoutPoints).name}
                   detail={`${knockoutPoints(maxBy(rows, knockoutPoints))} pts de eliminatoria`}
                 />
@@ -333,8 +348,18 @@ export function Leaderboard({ tournamentId }) {
           </p>
 
           <p className="lb-note">
-            Toca una fila para ver el detalle de cada persona (próximamente).
+            Toca una fila para ver el detalle de cada persona.
           </p>
+
+          {/* Gráfica de evolución (solo de las quinielas de ESTE torneo) */}
+          <EvolutionChart
+            rows={rows}
+            realResults={realResults}
+            tournament={tournament}
+            teams={teams}
+            annexCOptions={annexCOptions}
+            scoring={scoring}
+          />
         </>
       )}
     </main>

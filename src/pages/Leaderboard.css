@@ -251,6 +251,30 @@
 }
 
 /* ---------- Posicion / medalla ---------- */
+.lb-rankcell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-self: center;
+  gap: 2px;
+}
+
+.lb-delta {
+  font-size: 0.6rem;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.lb-delta--up {
+  color: var(--color-success);
+}
+.lb-delta--down {
+  color: var(--color-danger);
+}
+.lb-delta--same {
+  color: var(--color-text-subtle);
+}
+
 .lb-rank {
   display: flex;
   align-items: center;
