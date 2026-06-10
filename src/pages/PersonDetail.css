@@ -164,12 +164,20 @@
   border-bottom: 1px solid var(--color-border);
 }
 
-/* ---------- Fila de partido ---------- */
+/* ---------- Fila de partido (REJILLA consistente) ----------
+   Movil: fixture arriba (ancho completo), luego [real | puntos] abajo.
+   Desktop (>=560px): una sola fila [fixture | real | puntos].
+   Asi la pill de puntos y el marcador real se alinean entre filas, y el PEN
+   predicho (dentro del fixture) nunca descuadra. */
 .pd-match {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    'fix fix'
+    'real pts';
   align-items: center;
-  gap: var(--space-2) var(--space-3);
+  column-gap: var(--space-3);
+  row-gap: 4px;
   padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--color-border);
 }
@@ -178,12 +186,29 @@
   border-bottom: none;
 }
 
-/* Bloque de equipos + marcador predicho */
+@media (min-width: 560px) {
+  .pd-match {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-areas: 'fix real pts';
+    column-gap: var(--space-4);
+  }
+}
+
+/* Fixture: equipos + marcador predicho (y PEN predicho debajo) */
 .pd-fixture {
+  grid-area: fix;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+}
+
+.pd-fixture__line {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  flex: 1 1 auto;
+  width: 100%;
   min-width: 0;
 }
 
@@ -229,18 +254,24 @@
   text-align: center;
 }
 
-/* Resultado real + chip de estado */
-.pd-outcome {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-left: auto;
+/* PEN predicho: chip discreto bajo el marcador (no afecta el layout de la fila) */
+.pd-predpens {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  border-radius: var(--radius-pill);
+  padding: 1px 8px;
 }
 
+/* Resultado real: misma zona en todas las filas */
 .pd-real {
+  grid-area: real;
   font-size: 0.78rem;
   color: var(--color-text-muted);
   white-space: nowrap;
+  justify-self: start;
 }
 
 .pd-real strong {
@@ -248,49 +279,89 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ---------- Chips de estado ---------- */
-.pd-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 9px;
+@media (min-width: 560px) {
+  .pd-real {
+    justify-self: center;
+    text-align: center;
+    min-width: 5.5rem;
+  }
+}
+
+/* ---------- Pill de puntos (color por desempeno) + popover ---------- */
+.pd-points {
+  grid-area: pts;
+  justify-self: end;
+}
+
+.pd-pts {
+  position: relative;
+  display: inline-block;
+  min-width: 2.4rem;
+  padding: 3px 10px;
   border-radius: var(--radius-pill);
-  font-size: 0.72rem;
-  font-weight: 700;
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-align: center;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  cursor: help;
 }
 
-.pd-chip--exact {
-  background: var(--color-brand);
-  color: #fff;
+.pd-pts--pending {
+  background: transparent;
+  color: var(--color-text-subtle);
+  border: 1px dashed var(--color-border-strong);
+  font-weight: 600;
 }
-
-.pd-chip--outcome {
-  background: var(--color-brand-tint);
-  color: var(--color-brand-dark);
-}
-
-.pd-chip--miss {
+.pd-pts--miss {
   background: var(--color-bg);
   color: var(--color-text-subtle);
   border: 1px solid var(--color-border);
 }
-
-.pd-chip--pending {
-  background: transparent;
-  color: var(--color-text-subtle);
-  border: 1px dashed var(--color-border-strong);
+.pd-pts--basic {
+  background: var(--color-brand-tint); /* verde claro */
+  color: var(--color-brand-dark);
 }
-
-.pd-chip--pens {
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
-}
-
-.pd-chip--x2 {
-  background: var(--color-accent);
+.pd-pts--good {
+  background: var(--color-brand); /* verde oscuro */
   color: #fff;
-  box-shadow: var(--shadow-sm);
+}
+.pd-pts--max {
+  background: var(--color-accent); /* rosa mundial #E5006D: la jugada perfecta */
+  color: #fff;
+  box-shadow: 0 0 0 2px var(--color-accent-soft);
+}
+
+/* Popover: anclado a la derecha de la pill para no salirse en movil. */
+.pd-pts__tip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 0;
+  z-index: 20;
+  width: max-content;
+  max-width: 220px;
+  padding: 6px 10px;
+  background: var(--color-text);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: left;
+  white-space: normal;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(2px);
+  transition: opacity 0.12s ease, transform 0.12s ease, visibility 0.12s;
+}
+
+.pd-pts:hover .pd-pts__tip,
+.pd-pts:focus .pd-pts__tip,
+.pd-pts:focus-visible .pd-pts__tip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 
 /* ---------- Mini tabla de posiciones del grupo ---------- */

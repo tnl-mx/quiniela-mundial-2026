@@ -36,20 +36,63 @@ function initials(name) {
   return name.split(' ').map((w) => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase()
 }
 
-// Traduce un status + puntos a la clase de chip y su texto.
-function chipFor(status, points) {
-  switch (status) {
-    case 'exact':
-      return { cls: 'exact', text: `Exacto +${points}` }
-    case 'outcome':
-      return { cls: 'outcome', text: `Resultado +${points}` }
-    case 'miss':
-      return { cls: 'miss', text: 'Falló +0' }
-    case 'no-prediction':
-      return { cls: 'miss', text: 'Sin pronóstico' }
-    default:
-      return { cls: 'pending', text: 'Por jugar' }
+// Vista de la pill de puntos de un partido: { tier, label, tooltip }.
+//   tier define el COLOR:
+//     'pending' (neutro) · 'miss' (gris, +0) · 'basic' (verde claro, acierto
+//     basico) · 'good' (verde oscuro, marcador exacto) · 'max' (rosa mundial,
+//     la jugada perfecta: en eliminatoria todo acertado + penales con x2).
+//   tooltip explica de donde sale el numero (usa los puntos reales del motor).
+
+function groupPoints(item) {
+  if (!item) return { tier: 'pending', label: 'Por jugar', tooltip: 'Aún no se juega' }
+  const p = item.points
+  if (item.status === 'exact') return { tier: 'good', label: `+${p}`, tooltip: `Marcador exacto: +${p}` }
+  if (item.status === 'outcome') return { tier: 'basic', label: `+${p}`, tooltip: `Resultado acertado: +${p}` }
+  return { tier: 'miss', label: '+0', tooltip: 'No acertó el resultado: +0' }
+}
+
+function koPoints(mItem, pItem, x2) {
+  if (!mItem) return { tier: 'pending', label: 'Por jugar', tooltip: 'Aún no se juega (o no se dio el cruce)' }
+  const earned = (mItem.points || 0) + (pItem?.points || 0) + (x2?.points || 0)
+  const parts = []
+  parts.push(
+    mItem.status === 'exact'
+      ? `Marcador exacto +${mItem.points}`
+      : mItem.status === 'outcome'
+        ? `Resultado +${mItem.points}`
+        : 'Marcador +0',
+  )
+  if (pItem && pItem.points > 0) {
+    parts.push(pItem.status === 'exact-pens' ? `Penales exactos +${pItem.points}` : `Penales +${pItem.points}`)
   }
+  if (x2) parts.push(`Multiplicador ×${x2.factor || 2}: +${x2.points}`)
+  const tooltip = `${parts.join(' · ')} = +${earned}`
+  let tier
+  if (x2) tier = 'max' // jugada perfecta a penales -> rosa
+  else if (mItem.status === 'exact') tier = 'good'
+  else if (earned > 0) tier = 'basic'
+  else tier = 'miss'
+  return { tier, label: `+${earned}`, tooltip }
+}
+
+function champPoints(champItem) {
+  if (!champItem || champItem.status === 'pending') {
+    return { tier: 'pending', label: 'Por jugar', tooltip: 'Aún no hay campeón' }
+  }
+  if (champItem.status === 'hit') {
+    return { tier: 'good', label: `+${champItem.points}`, tooltip: `Campeón acertado: +${champItem.points}` }
+  }
+  return { tier: 'miss', label: '+0', tooltip: 'Campeón fallado: +0' }
+}
+
+// Pill de puntos con color por desempeño y popover (hover/tap) con la matematica.
+function PointsPill({ tier, label, tooltip }) {
+  return (
+    <span className={`pd-pts pd-pts--${tier}`} tabIndex={0}>
+      {label}
+      <span className="pd-pts__tip" role="tooltip">{tooltip}</span>
+    </span>
+  )
 }
 
 // ---------- Subcomponentes ----------
@@ -62,32 +105,38 @@ function Pill({ icon, label, value }) {
   )
 }
 
-// Una fila de partido: equipos + marcador predicho, y a la derecha el real
-// (si se jugo) + el chip de estado. `pens` y `x2` son adornos opcionales.
-function MatchRow({ teams, home, away, predText, realText, chip, pens, x2 }) {
+// Fila de partido con REJILLA consistente (todas las filas igual):
+//   [ fixture: equipos + marcador predicho (+ PEN predicho debajo) ]
+//   [ real: "Real X-Y" (· pen a-b) ]
+//   [ pill de puntos a la derecha ]
+// Asi la pill de puntos y el marcador real quedan alineados entre filas, y la
+// pill de penales predichos (PEN x-y) NO descuadra (vive dentro del fixture).
+// `predPens` = "x-y" (sin prefijo); `points` = { tier, label, tooltip }.
+function MatchRow({ teams, home, away, predText, predPens, realText, points }) {
   const flag = (c) => teams[c]?.flag ?? '🏳'
   return (
     <div className="pd-match">
       <div className="pd-fixture">
-        <span className="pd-team pd-team--home">
-          <span className="pd-code">{home ?? '—'}</span>
-          <span className="pd-flag" aria-hidden="true">{flag(home)}</span>
-        </span>
-        <span className="pd-pred">{predText}</span>
-        <span className="pd-team pd-team--away">
-          <span className="pd-flag" aria-hidden="true">{flag(away)}</span>
-          <span className="pd-code">{away ?? '—'}</span>
-        </span>
-      </div>
-      <div className="pd-outcome">
-        {realText && (
-          <span className="pd-real">
-            Real <strong>{realText}</strong>
+        <div className="pd-fixture__line">
+          <span className="pd-team pd-team--home">
+            <span className="pd-code">{home ?? '—'}</span>
+            <span className="pd-flag" aria-hidden="true">{flag(home)}</span>
           </span>
-        )}
-        {pens && <span className="pd-chip pd-chip--pens">{pens}</span>}
-        {x2 && <span className="pd-chip pd-chip--x2">×2!</span>}
-        <span className={`pd-chip pd-chip--${chip.cls}`}>{chip.text}</span>
+          <span className="pd-pred">{predText}</span>
+          <span className="pd-team pd-team--away">
+            <span className="pd-flag" aria-hidden="true">{flag(away)}</span>
+            <span className="pd-code">{away ?? '—'}</span>
+          </span>
+        </div>
+        {predPens && <span className="pd-predpens">PEN {predPens}</span>}
+      </div>
+
+      <div className="pd-real">
+        {realText ? <>Real <strong>{realText}</strong></> : null}
+      </div>
+
+      <div className="pd-points">
+        <PointsPill {...points} />
       </div>
     </div>
   )
@@ -171,8 +220,6 @@ export function PersonDetail({ row, position, tournament, teams, realResults, de
               {matches.map((m) => {
                 const item = gm[m.id]
                 const p = pred.groupMatches?.[m.id]
-                const chip = item ? chipFor(item.status, item.points) : chipFor('pending', 0)
-                const realText = item ? fmt(item.actual) : null
                 return (
                   <MatchRow
                     key={m.id}
@@ -180,8 +227,8 @@ export function PersonDetail({ row, position, tournament, teams, realResults, de
                     home={m.home}
                     away={m.away}
                     predText={fmt(p) ?? '—'}
-                    realText={realText}
-                    chip={chip}
+                    realText={item ? fmt(item.actual) : null}
+                    points={groupPoints(item)}
                   />
                 )
               })}
@@ -232,18 +279,17 @@ export function PersonDetail({ row, position, tournament, teams, realResults, de
                 const mItem = koMatch[id]
                 const pItem = koPens[id]
                 const x2 = koX2[id]
-                const chip = mItem ? chipFor(mItem.status, mItem.points) : chipFor('pending', 0)
 
                 // Penales que PREDIJO la persona (si capturo una llave empatada
-                // con pens). Es lo principal a mostrar (ahi vive el multiplicador).
+                // con pens). "x-y" sin prefijo (MatchRow le antepone "PEN ").
                 const pp = ko.pens
                 const predPens =
                   pp?.went && Number.isFinite(pp.hs) && Number.isFinite(pp.as)
-                    ? `PEN ${pp.hs}-${pp.as}`
+                    ? `${pp.hs}-${pp.as}`
                     : null
 
-                // Penales REALES (si ya se jugo y fue a pens): vienen mapeados
-                // por equipo en el item de scoring. Se anexan al marcador real.
+                // Penales REALES (si se jugo y fue a pens): mapeados por equipo
+                // en el item de scoring; se anexan al marcador real.
                 const rp = pItem?.actual
                 const realPens =
                   rp && Number.isFinite(rp.hs) && Number.isFinite(rp.as)
@@ -258,10 +304,9 @@ export function PersonDetail({ row, position, tournament, teams, realResults, de
                     home={ko.home}
                     away={ko.away}
                     predText={fmt(ko) ?? '—'}
+                    predPens={predPens}
                     realText={realText}
-                    chip={chip}
-                    pens={predPens}
-                    x2={!!x2}
+                    points={koPoints(mItem, pItem, x2)}
                   />
                 )
               })}
@@ -280,14 +325,12 @@ export function PersonDetail({ row, position, tournament, teams, realResults, de
               home={pred.champion}
               away={champItem?.actual ?? null}
               predText="👑"
-              realText={champItem?.actual ? `campeón: ${champItem.actual}` : null}
-              chip={
-                champItem?.status === 'hit'
-                  ? { cls: 'exact', text: `Acertó +${champItem.points}` }
-                  : champItem?.status === 'miss'
-                    ? { cls: 'miss', text: 'Falló +0' }
-                    : { cls: 'pending', text: 'Por jugar' }
+              realText={
+                champItem?.actual && champItem.status !== 'pending'
+                  ? `campeón: ${champItem.actual}`
+                  : null
               }
+              points={champPoints(champItem)}
             />
           </div>
         ) : (
