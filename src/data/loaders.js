@@ -13,8 +13,14 @@ function dataUrl(file) {
   return `${base}data/${file}`.replace(/\/+/g, '/')
 }
 
+// Los datos viven en URLs FIJAS (sin hash) y cambian por commit
+// (tournaments.json, real-results.json, quinielas...). GitHub Pages los sirve
+// con cache-control: max-age=600, asi que el navegador podria mostrar una
+// version vieja hasta 10 min. Con cache: 'no-cache' forzamos revalidacion con
+// el servidor (ETag/Last-Modified): responde 304 si no cambio (rapido) o el
+// archivo fresco si cambio. Asi un cambio subido se ve de inmediato.
 async function fetchJson(file) {
-  const res = await fetch(dataUrl(file))
+  const res = await fetch(dataUrl(file), { cache: 'no-cache' })
   if (!res.ok) {
     throw new Error(`No se pudo cargar ${file}: ${res.status} ${res.statusText}`)
   }
@@ -22,7 +28,7 @@ async function fetchJson(file) {
 }
 
 async function fetchText(file) {
-  const res = await fetch(dataUrl(file))
+  const res = await fetch(dataUrl(file), { cache: 'no-cache' })
   if (!res.ok) {
     throw new Error(`No se pudo cargar ${file}: ${res.status} ${res.statusText}`)
   }
