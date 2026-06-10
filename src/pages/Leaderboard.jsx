@@ -314,8 +314,9 @@ export function Leaderboard({ tournamentId }) {
               <div className="lb-rank-head">#</div>
               <div>Participante</div>
               {CATEGORIES.map((c) => (
+                // Encabezados SOLO texto (sin emoji): se alinean parejo sobre
+                // sus columnas de numeros. Los emojis siguen en pills y leyenda.
                 <button type="button" className="lb-cell lb-th" key={c.key}>
-                  <span className="lb-th__icon" aria-hidden="true">{c.icon}</span>
                   <span className="lb-th__label">{c.long}</span>
                   <span className="lb-th__tip" role="tooltip">{c.help}</span>
                 </button>
