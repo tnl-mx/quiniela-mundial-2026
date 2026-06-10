@@ -1,13 +1,14 @@
-// Barra superior del wizard. Enfoque hibrido, priorizando MOVIL:
-//   - Siempre visibles (las 2 acciones mas usadas): "Mi progreso" (el mapa de
-//     la quiniela) y "Compartir" (la pantalla de exportar/mandar la quiniela).
-//   - En DESKTOP (>=900px) hay espacio, asi que ademas mostramos directo:
-//     "Importar", "Editar datos", "Borrar fase" y "Empezar de nuevo".
-//   - En MOVIL/tablet (<900px) esas opciones viven en un menu desplegable "⋯"
-//     bien etiquetado y tappable, para no saturar la barra angosta.
-// Reseteo dividido en DOS entradas visibles: "Borrar fase" (arreglar una
-// parte) y "Empezar de nuevo" (reinicio grande), no escondidas en una sola.
-// Abajo, la barra de progreso (grupos X/72 o bracket X/32).
+// Barra superior del wizard. El header NO es identico en movil y desktop:
+//   - Siempre visibles (movil y desktop): "Mi progreso" (el mapa de la
+//     quiniela) y "Compartir" (exportar/mandar la quiniela). Son las dos mas
+//     usadas.
+//   - DESKTOP (>=700px): ademas mostramos directo en la barra "Importar",
+//     "Editar datos", "Borrar fase" y "Empezar de nuevo".
+//   - MOVIL (<700px): esas cuatro viven en un BOTTOM SHEET (hoja que sube
+//     desde abajo, ancho completo, lista vertical grande y tappable). Asi la
+//     barra angosta solo lleva 2 botones + "Más" y no se satura ni se corta.
+// Reseteo dividido en DOS entradas: "Borrar fase" (arreglar una parte) y
+// "Empezar de nuevo" (reinicio grande). Abajo, la barra de progreso.
 
 import { useState } from 'react'
 
@@ -40,13 +41,84 @@ export function Header({
   onEditData,
 }) {
   const inBracketView = !!currentBracketMatchId
+  // El boton "Más" abre un menu con el resto de acciones. menuOpen controla su
+  // visibilidad. El MISMO estado alimenta el bottom sheet (movil) y el
+  // dropdown (desktop); CSS decide cual se ve segun el ancho.
   const [menuOpen, setMenuOpen] = useState(false)
+  const closeMenu = () => setMenuOpen(false)
 
-  // Ejecuta una accion del menu y lo cierra.
+  // Ejecuta una accion del menu: PRIMERO cierra el menu y LUEGO dispara la
+  // accion (abrir un modal/panel), para que no queden encimados.
   const runMenu = (fn) => () => {
     setMenuOpen(false)
     fn()
   }
+
+  // Contenido del menu "Más", organizado en dos grupos. Es la MISMA data para
+  // el sheet movil y el dropdown desktop. tone: 'normal' | 'warning' | 'danger'.
+  const menuGroups = [
+    {
+      label: 'Tu quiniela',
+      items: [
+        {
+          icon: '⬇',
+          title: 'Importar quiniela',
+          desc: 'Carga una quiniela guardada (archivo o texto).',
+          tone: 'normal',
+          onClick: onShowImport,
+        },
+        {
+          icon: '✎',
+          title: 'Editar mis datos',
+          desc: 'Cambia tu nombre o correo.',
+          tone: 'normal',
+          onClick: onEditData,
+        },
+      ],
+    },
+    {
+      label: 'Reiniciar',
+      items: [
+        {
+          icon: '✂',
+          title: 'Borrar fase',
+          desc: 'Reinicia una etapa específica (grupos, octavos, etc.).',
+          tone: 'warning',
+          onClick: onShowResetPhase,
+        },
+        {
+          icon: '↻',
+          title: 'Empezar de nuevo',
+          desc: 'Borra tu quiniela, o borra todo y vuelve al inicio.',
+          tone: 'danger',
+          onClick: onShowStartOver,
+        },
+      ],
+    },
+  ]
+
+  // Render compartido de los grupos del menu (mismo en sheet y dropdown).
+  const renderMenuGroups = () =>
+    menuGroups.map((group) => (
+      <div className="wiz-more-group" key={group.label}>
+        <p className="wiz-more-grouplabel">{group.label}</p>
+        {group.items.map((it) => (
+          <button
+            key={it.title}
+            type="button"
+            role="menuitem"
+            className={`wiz-more-item is-${it.tone}`}
+            onClick={runMenu(it.onClick)}
+          >
+            <span className="wiz-more-icon" aria-hidden="true">{it.icon}</span>
+            <span className="wiz-more-text">
+              <span className="wiz-more-title">{it.title}</span>
+              <span className="wiz-more-desc">{it.desc}</span>
+            </span>
+          </button>
+        ))}
+      </div>
+    ))
 
   let stepText = ''
   if (currentGroup) {
@@ -82,7 +154,7 @@ export function Header({
             </p>
           </div>
           <div className="wiz-header-actions">
-            {/* Siempre visibles: las 2 acciones mas usadas. */}
+            {/* EXACTAMENTE 3 botones, iguales en movil y desktop. */}
             <button
               type="button"
               className="btn btn-secondary"
@@ -98,95 +170,35 @@ export function Header({
               Compartir
             </button>
 
-            {/* Solo DESKTOP: opciones directas (hay espacio de sobra). */}
-            <button
-              type="button"
-              className="btn btn-secondary wiz-action-desktop"
-              onClick={onShowImport}
-            >
-              Importar
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary wiz-action-desktop"
-              onClick={onEditData}
-            >
-              Editar datos
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary wiz-action-desktop"
-              onClick={onShowResetPhase}
-            >
-              Borrar fase
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary wiz-action-desktop"
-              onClick={onShowStartOver}
-            >
-              Empezar de nuevo
-            </button>
-
-            {/* Solo MOVIL/tablet: menu desplegable con el resto, bien
-                etiquetado y con objetivos grandes para tocar. */}
-            <div className="wiz-menu wiz-menu-mobile">
+            {/* "Más": en desktop abre un dropdown anclado aqui (a la derecha);
+                en movil abre el bottom sheet de mas abajo. Mismo estado. */}
+            <div className="wiz-more">
               <button
                 type="button"
-                className="btn btn-icon"
+                className="btn btn-secondary wiz-more-trigger"
                 onClick={() => setMenuOpen((o) => !o)}
                 aria-haspopup="menu"
                 aria-expanded={menuOpen}
-                aria-label="Más opciones"
-                title="Más opciones"
               >
-                ⋯
+                <span aria-hidden="true">☰</span> Más
               </button>
 
+              {/* Dropdown DESKTOP (CSS lo muestra solo en >=700px). */}
               {menuOpen && (
-                <>
-                  {/* Capa para cerrar al tocar fuera. */}
+                <div className="wiz-more-dropdown-wrap">
                   <div
-                    className="wiz-menu-backdrop"
-                    onClick={() => setMenuOpen(false)}
+                    className="wiz-more-backdrop"
+                    onClick={closeMenu}
                     role="presentation"
                   />
-                  <div className="wiz-menu-panel" role="menu">
-                    <button
-                      type="button"
-                      className="wiz-menu-item"
-                      role="menuitem"
-                      onClick={runMenu(onShowImport)}
-                    >
-                      ⬇ Importar quiniela
-                    </button>
-                    <button
-                      type="button"
-                      className="wiz-menu-item"
-                      role="menuitem"
-                      onClick={runMenu(onEditData)}
-                    >
-                      ✎ Editar mis datos
-                    </button>
-                    <div className="wiz-menu-sep" role="separator" />
-                    <button
-                      type="button"
-                      className="wiz-menu-item"
-                      role="menuitem"
-                      onClick={runMenu(onShowResetPhase)}
-                    >
-                      ✂ Borrar fase
-                    </button>
-                    <button
-                      type="button"
-                      className="wiz-menu-item is-danger"
-                      role="menuitem"
-                      onClick={runMenu(onShowStartOver)}
-                    >
-                      ↻ Empezar de nuevo
-                    </button>
+                  <div
+                    className="wiz-more-dropdown"
+                    role="menu"
+                    aria-label="Más opciones"
+                  >
+                    {renderMenuGroups()}
                   </div>
-                </>
+                </div>
               )}
             </div>
           </div>
@@ -207,6 +219,34 @@ export function Header({
           </div>
         </div>
       </div>
+
+      {/* Bottom sheet MOVIL (CSS lo muestra solo en <700px). Hoja desde abajo,
+          ancho completo; el overlay cierra al tocar fuera. Mismo contenido que
+          el dropdown desktop. */}
+      {menuOpen && (
+        <div
+          className="wiz-sheet-backdrop"
+          onClick={closeMenu}
+          role="presentation"
+        >
+          <div
+            className="wiz-sheet"
+            role="menu"
+            aria-label="Más opciones"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="wiz-sheet-handle" aria-hidden="true" />
+            {renderMenuGroups()}
+            <button
+              type="button"
+              className="btn btn-secondary wiz-sheet-close"
+              onClick={closeMenu}
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
     </header>
   )
 }

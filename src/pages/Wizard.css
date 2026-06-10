@@ -128,18 +128,15 @@
   align-items: center;
 }
 
-/* Botones que solo aparecen directos en DESKTOP (en movil van al menu "⋯"). */
-.wiz-action-desktop {
-  display: none;
-}
+/* El header lleva SIEMPRE 3 botones (Mi progreso, Compartir, Más) en ambas
+   plataformas. El resto vive dentro de "Más": bottom sheet en movil, dropdown
+   en desktop (ver mas abajo). Breakpoint: ~700px.
 
-@media (min-width: 900px) {
-  .wiz-action-desktop {
-    display: inline-flex;
-  }
-  /* En desktop ya hay botones directos: ocultamos el menu "⋯". */
-  .wiz-menu-mobile {
-    display: none;
+   En movil, los 3 botones van compactos para no robar altura. */
+@media (max-width: 699.98px) {
+  .wiz-header-actions .btn {
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.875rem;
   }
 }
 
@@ -2546,73 +2543,207 @@
   .coronation-trophy { animation: none; }
 }
 
-/* ============ Menu "⋯" del header ============ */
-.wiz-menu {
-  position: relative;
-}
+/* ============ Menu "Más" del header (sheet movil + dropdown desktop) ======
+   El boton "Más" abre el MISMO contenido en dos presentaciones:
+     - MOVIL (<700px):  bottom sheet (hoja desde abajo, ancho completo).
+     - DESKTOP (>=700): dropdown anclado al boton, alineado a la derecha.
+   El contenido (grupos + items con descripcion) usa clases .wiz-more-*
+   compartidas por ambas presentaciones. */
 
-.wiz-menu-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 90;
-}
-
-.wiz-menu-panel {
-  position: absolute;
-  top: calc(100% + var(--space-2));
-  right: 0;
-  z-index: 91;
-  min-width: 200px;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  padding: var(--space-2);
+/* ---- Contenido compartido: grupos, etiquetas e items ---- */
+.wiz-more-group {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.wiz-menu-item {
+/* Separacion evidente entre el grupo seguro y el destructivo. */
+.wiz-more-group + .wiz-more-group {
+  margin-top: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+
+.wiz-more-grouplabel {
+  margin: 0 0 var(--space-1);
+  padding: 0 var(--space-3);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-subtle);
+}
+
+/* Cada item: icono + (titulo claro / descripcion atenuada). */
+.wiz-more-item {
   display: flex;
-  align-items: center;
-  gap: var(--space-2);
+  align-items: flex-start;
+  gap: var(--space-3);
   width: 100%;
+  padding: var(--space-3);
   text-align: left;
   background: transparent;
   border: none;
-  border-radius: var(--radius-sm);
-  padding: var(--space-3);
-  min-height: 44px;
+  border-radius: var(--radius-md);
   font-family: inherit;
-  font-size: 0.9375rem;
-  font-weight: 600;
   color: var(--color-text);
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
 
-.wiz-menu-item:hover {
+.wiz-more-item:hover,
+.wiz-more-item:active {
   background-color: var(--color-bg);
 }
 
-.wiz-menu-item:focus-visible {
+.wiz-more-item:focus-visible {
   outline: 3px solid var(--color-accent);
   outline-offset: -2px;
 }
 
-.wiz-menu-item.is-danger {
+.wiz-more-icon {
+  width: 1.5rem;
+  flex-shrink: 0;
+  text-align: center;
+  font-size: 1.125rem;
+  line-height: 1.4;
+}
+
+.wiz-more-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.wiz-more-title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.wiz-more-desc {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  line-height: 1.35;
+}
+
+/* Tonos por severidad. El titulo lleva el color; la descripcion se mantiene
+   atenuada para legibilidad. */
+.wiz-more-item.is-warning .wiz-more-title {
+  color: #92400e;
+}
+
+.wiz-more-item.is-danger .wiz-more-title {
   color: var(--color-danger);
 }
 
-.wiz-menu-item.is-danger:hover {
+.wiz-more-item.is-danger:active {
   background-color: rgba(220, 38, 38, 0.08);
 }
 
-.wiz-menu-sep {
-  height: 1px;
-  background-color: var(--color-border);
-  margin: var(--space-1) 0;
+/* ---- Wrapper del boton "Más" (ancla del dropdown desktop) ---- */
+.wiz-more {
+  position: relative;
+}
+
+/* ---- Dropdown DESKTOP ---- */
+.wiz-more-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+}
+
+.wiz-more-dropdown {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0; /* alineado a la derecha para no cortarse */
+  z-index: 151;
+  width: 320px;
+  max-width: calc(100vw - var(--space-6));
+  max-height: 80vh;
+  overflow-y: auto;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-2);
+}
+
+/* En MOVIL el dropdown no se usa (se usa el sheet); lo ocultamos. */
+@media (max-width: 699.98px) {
+  .wiz-more-dropdown-wrap {
+    display: none;
+  }
+}
+
+/* ---- Bottom sheet MOVIL ---- */
+.wiz-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background-color: rgba(15, 23, 42, 0.5);
+  display: flex;
+  align-items: flex-end; /* la hoja se pega al fondo */
+  animation: wiz-sheet-fade 0.2s ease;
+}
+
+.wiz-sheet {
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow: var(--shadow-lg);
+  /* Respeta el area segura inferior (notch/gestos) en moviles. */
+  padding: var(--space-3) var(--space-3)
+    calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+  animation: wiz-sheet-up 0.25s ease;
+}
+
+/* En el sheet los items son mas altos (mas tappables que en desktop). */
+.wiz-sheet .wiz-more-item {
+  min-height: 56px;
+}
+
+/* Asita decorativa arriba de la hoja. */
+.wiz-sheet-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-border-strong);
+  margin: 0 auto var(--space-3);
+}
+
+.wiz-sheet-close {
+  width: 100%;
+  margin-top: var(--space-3);
+}
+
+@keyframes wiz-sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes wiz-sheet-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Sin animacion para quien prefiere menos movimiento. */
+@media (prefers-reduced-motion: reduce) {
+  .wiz-sheet-backdrop,
+  .wiz-sheet {
+    animation: none;
+  }
+}
+
+/* En DESKTOP el sheet no se usa (se usa el dropdown); lo ocultamos. */
+@media (min-width: 700px) {
+  .wiz-sheet-backdrop {
+    display: none;
+  }
 }
 
 /* ============ Pantalla de bienvenida (participante) ============ */
