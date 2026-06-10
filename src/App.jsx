@@ -11,14 +11,27 @@ import { useHashRoute } from './data/useHashRoute.js'
 import { QuinielaApp } from './pages/QuinielaApp.jsx'
 import { TournamentsIndex } from './pages/TournamentsIndex.jsx'
 import { Leaderboard } from './pages/Leaderboard.jsx'
+import { AdminPanel } from './pages/AdminPanel.jsx'
+import { AdminGear } from './components/AdminGear.jsx'
 
 export default function App() {
   const route = useHashRoute()
 
-  if (route === '') return <QuinielaApp />
-  if (route === 'torneos') return <TournamentsIndex />
+  // El panel de admin no lleva engrane (ya estas dentro).
+  if (route === 'admin') return <AdminPanel />
 
+  // Resto de rutas: la pagina + el engrane discreto de acceso al panel.
+  let page
+  if (route === '') page = <QuinielaApp />
+  else if (route === 'torneos') page = <TournamentsIndex />
   // Cualquier otro segmento es el id de un torneo (#/familia, #/empresa, #/demo).
   // Si no existe, el propio Leaderboard muestra "Torneo no encontrado".
-  return <Leaderboard tournamentId={route} />
+  else page = <Leaderboard tournamentId={route} />
+
+  return (
+    <>
+      {page}
+      <AdminGear />
+    </>
+  )
 }

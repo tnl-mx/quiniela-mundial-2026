@@ -1,0 +1,475 @@
+/* ============================================================================
+   Panel del organizador (#/admin). Mobile-first, reutiliza tokens de index.css.
+   Las filas de captura son compactas para caber a ~390px sin scroll horizontal.
+   ============================================================================ */
+
+.adm-page {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-4) var(--space-10);
+}
+
+/* ---------- Botones (scopeados al panel para no tocar los globales) ---------- */
+.adm-page .btn,
+.adm-gate .btn {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-weight: 600;
+  padding: var(--space-2) var(--space-4);
+  cursor: pointer;
+  transition: filter 0.12s ease;
+}
+.adm-page .btn-primary,
+.adm-gate .btn-primary {
+  background: var(--color-brand);
+  color: #fff;
+}
+.adm-page .btn-secondary,
+.adm-gate .btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-brand-dark);
+  border-color: var(--color-border-strong);
+}
+.adm-page .btn-tertiary {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+.adm-page .btn:hover,
+.adm-gate .btn:hover {
+  filter: brightness(0.97);
+}
+
+.adm-link {
+  appearance: none;
+  background: none;
+  border: none;
+  font: inherit;
+  color: var(--color-brand);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+.adm-link.adm-danger {
+  color: var(--color-danger);
+}
+
+/* ---------- Barra superior ---------- */
+.adm-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+.adm-bar__title {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.adm-bar__sub {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+.adm-bar__progress {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.adm-bar__stale {
+  color: var(--color-warning);
+  font-weight: 700;
+}
+.adm-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+.adm-note {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  background: var(--color-brand-tint);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  margin: 0 0 var(--space-5);
+}
+.adm-note code {
+  font-size: 0.78em;
+}
+
+.adm-muted {
+  color: var(--color-text-muted);
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* ---------- Secciones / bloques ---------- */
+.adm-section {
+  margin-bottom: var(--space-6);
+}
+.adm-section__title {
+  margin: 0 0 var(--space-3);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--color-brand-dark);
+}
+.adm-block {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-4);
+  overflow: hidden;
+}
+.adm-block__title {
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* ---------- Fila de partido ---------- */
+.adm-match {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+.adm-match:last-child {
+  border-bottom: none;
+}
+.adm-match.is-captured {
+  background: color-mix(in srgb, var(--color-brand-tint) 45%, transparent);
+}
+.adm-match.is-stale {
+  background: #fff7e6;
+  box-shadow: inset 3px 0 0 var(--color-warning);
+}
+.adm-match.is-pending {
+  color: var(--color-text-subtle);
+  gap: var(--space-3);
+}
+.adm-pending-msg {
+  font-size: 0.82rem;
+  font-style: italic;
+}
+
+.adm-ko-id {
+  flex: 0 0 auto;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-text-subtle);
+  min-width: 2.5rem;
+}
+
+/* Equipos + marcador */
+.adm-fixture {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1 1 280px;
+  min-width: 0;
+}
+.adm-team {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1 1 0;
+  min-width: 0;
+}
+.adm-team--home {
+  justify-content: flex-end;
+}
+.adm-team--away {
+  justify-content: flex-start;
+}
+.adm-flag {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+.adm-code {
+  font-weight: 700;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+.adm-vs {
+  color: var(--color-text-subtle);
+  font-weight: 700;
+}
+
+/* Stepper +/- */
+.adm-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex: 0 0 auto;
+}
+.adm-stepper__btn {
+  appearance: none;
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-text);
+  cursor: pointer;
+}
+.adm-stepper__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.adm-stepper__val {
+  min-width: 1.4rem;
+  text-align: center;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Acciones / etiquetas de estado */
+.adm-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+.adm-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+.adm-tag--ok {
+  background: var(--color-brand);
+  color: #fff;
+}
+.adm-tag--todo {
+  background: var(--color-bg);
+  color: var(--color-text-subtle);
+  border: 1px solid var(--color-border);
+}
+.adm-tag--stale {
+  background: var(--color-warning);
+  color: #4a3500;
+  white-space: normal;
+}
+.adm-tag--local {
+  background: var(--color-info);
+  color: #fff;
+}
+
+/* ---------- Fila de conflicto (oficial vs borrador) ---------- */
+.adm-match.is-conflict {
+  background: #fff7e6;
+  box-shadow: inset 3px 0 0 var(--color-warning);
+  align-items: flex-start;
+}
+.adm-conflict {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.adm-conflict__head {
+  margin: 0 0 var(--space-2);
+  font-size: 0.85rem;
+  color: #7a5b00;
+}
+.adm-conflict__opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-2);
+}
+.adm-conflict__opt strong {
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+.adm-conflict__btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.adm-conflict__btns .btn {
+  font-size: 0.8rem;
+  padding: var(--space-1) var(--space-3);
+}
+
+/* La barra de progreso lleva varios tramos. */
+.adm-bar__progress span {
+  white-space: nowrap;
+}
+
+/* Penales */
+.adm-pens {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1 1 100%;
+  padding-left: 2.5rem;
+}
+.adm-pens__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  text-transform: uppercase;
+}
+.adm-pens__warn {
+  font-size: 0.72rem;
+  color: var(--color-danger);
+}
+
+/* ---------- Desempate manual ---------- */
+.adm-tiebreak {
+  background: #fff7e6;
+  border: 1px solid var(--color-warning);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-3);
+}
+.adm-tiebreak__title {
+  margin: 0 0 var(--space-2);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #7a5b00;
+}
+.adm-tiebreak__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 3px 0;
+}
+.adm-tiebreak__pos {
+  font-weight: 800;
+  min-width: 1.6rem;
+}
+.adm-tiebreak__name {
+  color: var(--color-text-muted);
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.adm-tiebreak__moves button {
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.adm-tiebreak__save {
+  margin-top: var(--space-2);
+}
+
+/* ---------- Campeón ---------- */
+.adm-champion {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 1.2rem;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+.adm-champion .adm-flag {
+  font-size: 1.6rem;
+}
+
+/* ---------- Relleno de prueba / footer ---------- */
+.adm-testfill {
+  margin-top: var(--space-2);
+}
+.adm-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* ---------- Gate de PIN ---------- */
+.adm-gate {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+.adm-gate__card {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+.adm-gate__title {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--color-brand-dark);
+}
+.adm-gate__sub {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+.adm-gate__input {
+  font: inherit;
+  font-size: 1.2rem;
+  text-align: center;
+  letter-spacing: 0.3em;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+}
+.adm-gate__error {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.adm-gate__note {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--color-text-subtle);
+  line-height: 1.4;
+}
+.adm-gate__home {
+  font-size: 0.82rem;
+  color: var(--color-brand);
+  text-decoration: none;
+}
+.adm-gate__home:hover {
+  text-decoration: underline;
+}
