@@ -145,3 +145,13 @@ vite.config.ts.timestamp-*
 # macOS
 .DS_Store
 .DS_Store
+
+# ============================================================
+# DATOS DE DEMO del leaderboard (TEMPORALES, solo local).
+# NUNCA se suben a produccion: git los ignora a proposito para
+# que no aparezcan quinielas inventadas ni resultados falsos del
+# Mundial en el sitio publico. Ver el modo demo en src/App.jsx.
+# ============================================================
+public/data/predictions-demo/
+public/data/real-results-demo.json
+scripts/generar-demo.js

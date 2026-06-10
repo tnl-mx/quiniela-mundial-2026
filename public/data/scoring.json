@@ -1,7 +1,9 @@
 {
-  "match": { "outcome": 1, "goalDiff": 2, "exactScore": 3 },
-  "groups": { "advances": 2, "exactPosition": 3 },
-  "knockout": { "winner": 2, "exactScore": 3 },
-  "penalties": { "wentToPens": 1, "winner": 2, "exactPens": 3 },
-  "awards": { "champion": 5, "finalists": 4, "fifaAward": 4 }
+  "groupMatch": { "outcome": 1, "exactScore": 3 },
+  "groupTable": { "advances": 2, "exactPosition": 3 },
+  "knockoutAdvance": { "r16": 1, "qf": 2, "sf": 3, "final": 4 },
+  "knockoutMatch": { "outcome": 1, "exactScore": 3 },
+  "penalties": { "wentToPens": 1, "exactPens": 2 },
+  "penaltiesMultiplier": 2,
+  "champion": 5
 }

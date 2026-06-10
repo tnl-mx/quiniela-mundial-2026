@@ -41,3 +41,34 @@ export async function loadAnnexCOptions() {
   const text = await fetchText('annex_C_combinations.csv')
   return parseAnnexCcsv(text)
 }
+
+// ---------- Datos para el leaderboard (multi-torneo) -----------------------
+// La estructura es multi-torneo: cada torneo tiene su carpeta de quinielas
+// (predictionsDir) pero TODOS comparten el mismo real-results del Mundial.
+// La config vive en tournaments.json (fuente unica, compartida con el script
+// que genera los indices).
+
+export async function loadScoring() {
+  return fetchJson('scoring.json')
+}
+
+// Lista de torneos disponibles y el nombre del real-results compartido.
+export async function loadTournamentsConfig() {
+  return fetchJson('tournaments.json')
+}
+
+// Resultados reales del Mundial (compartidos por todos los torneos).
+export async function loadRealResults(file = 'real-results.json') {
+  return fetchJson(file)
+}
+
+// Indice (array de nombres de archivo) de las quinielas de un torneo.
+// `dir` es la carpeta del torneo, ej. "predictions/familia".
+export async function loadPredictionIndex(dir) {
+  return fetchJson(`${dir}/index.json`)
+}
+
+// Lee UNA quiniela por su carpeta de torneo + nombre de archivo.
+export async function loadPrediction(dir, file) {
+  return fetchJson(`${dir}/${file}`)
+}

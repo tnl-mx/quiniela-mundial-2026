@@ -1,0 +1,17 @@
+{
+  "realResults": "real-results.json",
+  "tournaments": [
+    {
+      "id": "familia",
+      "name": "Quiniela Familiar",
+      "predictionsDir": "predictions/familia",
+      "active": true
+    },
+    {
+      "id": "empresa",
+      "name": "Quiniela Empresa",
+      "predictionsDir": "predictions/empresa",
+      "active": false
+    }
+  ]
+}

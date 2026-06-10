@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "indice": "node scripts/generar-indice.js",
+    "prebuild": "node scripts/generar-indice.js",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest"

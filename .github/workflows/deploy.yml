@@ -36,6 +36,9 @@ jobs:
       - name: Instalar dependencias (limpio y reproducible)
         run: npm ci
 
+      - name: Generar indice de quinielas (predictions/index.json)
+        run: npm run indice
+
       - name: Construir (vite build, con base /quiniela-mundial-2026/)
         run: npm run build
 
