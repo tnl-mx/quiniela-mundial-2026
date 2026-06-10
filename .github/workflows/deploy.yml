@@ -1,0 +1,60 @@
+name: Deploy a GitHub Pages
+
+# Se dispara en cada push a main, y tambien se puede lanzar a mano desde la
+# pestaña Actions (workflow_dispatch).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Permisos minimos que necesitan las actions oficiales de Pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Un solo deploy a la vez; no cancelamos el que este en curso para no dejar
+# Pages a medias.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  # 1) Construye el sitio estatico y sube dist/ como artefacto de Pages.
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependencias (limpio y reproducible)
+        run: npm ci
+
+      - name: Construir (vite build, con base /quiniela-mundial-2026/)
+        run: npm run build
+
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+
+      - name: Subir artefacto (carpeta dist)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  # 2) Publica el artefacto en GitHub Pages.
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Desplegar a GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,100 @@
+/* ============================================================
+   Design tokens - paleta y escalas reutilizables en toda la app.
+   ============================================================ */
+:root {
+  /* Superficies y texto */
+  --color-bg: #F4F7F5;
+  --color-surface: #FFFFFF;
+  --color-text: #0F172A;
+  --color-text-muted: #64748B;
+  --color-text-subtle: #94A3B8;
+  --color-border: #E2E8F0;
+  --color-border-strong: #CBD5E1;
+
+  /* Brand - verde cesped */
+  --color-brand: #0E7A4F;
+  --color-brand-dark: #0A5839;
+  --color-brand-tint: #D6F1E1;
+
+  /* Acentos - magenta FIFA 2026 (solo para "estoy editando aqui") */
+  --color-accent: #E5006D;
+  --color-accent-soft: #FCE4EF;
+
+  /* Funcional */
+  --color-info: #2563EB;
+  --color-warning: #F59E0B;
+  --color-success: #16A34A;
+  --color-danger: #DC2626;
+
+  /* Espaciado (escala de 4px) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-8: 48px;
+  --space-10: 64px;
+
+  /* Radios */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 10px 24px rgba(15, 23, 42, 0.12);
+
+  /* Tipografia */
+  --font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ============ Reset base ============ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+body {
+  font-family: var(--font-family);
+  line-height: 1.5;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* ============ Pantalla de bienvenida (se conserva para revertir
+   facilmente cuando termine el prototipo visual) ============ */
+.welcome {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.welcome h1 {
+  margin: 0;
+  font-size: clamp(1.75rem, 5vw, 3rem);
+  font-weight: 700;
+}
