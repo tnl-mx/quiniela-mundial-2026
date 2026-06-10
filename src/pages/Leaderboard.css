@@ -42,6 +42,15 @@
   color: var(--color-brand-dark);
 }
 
+/* Nombre del torneo (subtitulo): acento, debajo del titulo grande fijo. */
+.lb-tournament {
+  margin: var(--space-1) 0 0;
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: var(--color-accent);
+}
+
 .lb-subtitle {
   margin: var(--space-2) 0 0;
   font-size: 0.85rem;

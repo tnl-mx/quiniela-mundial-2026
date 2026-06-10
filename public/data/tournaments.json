@@ -3,13 +3,13 @@
   "tournaments": [
     {
       "id": "familia",
-      "name": "Quiniela Familiar",
+      "name": "TNL's Invitational",
       "predictionsDir": "predictions/familia",
       "active": true
     },
     {
       "id": "empresa",
-      "name": "Quiniela Empresa",
+      "name": "NEM-X",
       "predictionsDir": "predictions/empresa",
       "active": false
     }

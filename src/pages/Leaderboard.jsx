@@ -238,10 +238,6 @@ export function Leaderboard({ tournamentId }) {
         ? `Fase de grupos en curso · ${counts.groupPlayed} partidos jugados`
         : 'El torneo aún no comienza'
 
-  const title = tournamentName
-    ? `${tournamentName} · Mundial 2026`
-    : 'Leaderboard · Quiniela Mundial 2026'
-
   return (
     <main className="lb-page">
       <a className="lb-home-link" href={QUINIELA_URL}>
@@ -249,7 +245,11 @@ export function Leaderboard({ tournamentId }) {
       </a>
 
       <header className="lb-header">
-        <h1 className="lb-title">{title}</h1>
+        {/* Titulo grande FIJO (igual para todos los torneos) */}
+        <h1 className="lb-title">QUINIELA MUNDIAL 2026</h1>
+        {/* Subtitulo = nombre del torneo (sale de tournaments.json) */}
+        {tournamentName && <p className="lb-tournament">{tournamentName}</p>}
+        {/* Estado del torneo */}
         <p className="lb-subtitle">{subtitle}</p>
         {demo && <span className="lb-demo-flag">⚠ Modo demo · datos de ejemplo</span>}
       </header>
