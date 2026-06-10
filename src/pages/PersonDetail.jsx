@@ -233,14 +233,24 @@ export function PersonDetail({ row, position, tournament, teams, realResults, de
                 const pItem = koPens[id]
                 const x2 = koX2[id]
                 const chip = mItem ? chipFor(mItem.status, mItem.points) : chipFor('pending', 0)
-                const realText = mItem ? fmt(mItem.actual) : null
-                const pensLabel = pItem
-                  ? pItem.status === 'exact-pens'
-                    ? `pens ✓ +${pItem.points}`
-                    : pItem.status === 'went'
-                      ? `pens +${pItem.points}`
-                      : 'pens ✗'
-                  : null
+
+                // Penales que PREDIJO la persona (si capturo una llave empatada
+                // con pens). Es lo principal a mostrar (ahi vive el multiplicador).
+                const pp = ko.pens
+                const predPens =
+                  pp?.went && Number.isFinite(pp.hs) && Number.isFinite(pp.as)
+                    ? `PEN ${pp.hs}-${pp.as}`
+                    : null
+
+                // Penales REALES (si ya se jugo y fue a pens): vienen mapeados
+                // por equipo en el item de scoring. Se anexan al marcador real.
+                const rp = pItem?.actual
+                const realPens =
+                  rp && Number.isFinite(rp.hs) && Number.isFinite(rp.as)
+                    ? ` · pen ${rp.hs}-${rp.as}`
+                    : ''
+                const realText = mItem ? `${fmt(mItem.actual)}${realPens}` : null
+
                 return (
                   <MatchRow
                     key={id}
@@ -250,7 +260,7 @@ export function PersonDetail({ row, position, tournament, teams, realResults, de
                     predText={fmt(ko) ?? '—'}
                     realText={realText}
                     chip={chip}
-                    pens={pensLabel}
+                    pens={predPens}
                     x2={!!x2}
                   />
                 )
