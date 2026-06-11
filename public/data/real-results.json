@@ -1,5 +1,7 @@
 {
-  "groupMatches": {},
+  "groupMatches": {
+    "A1": { "hs": 2, "as": 0 }
+  },
   "knockout": {},
   "champion": null,
   "awards": {}
