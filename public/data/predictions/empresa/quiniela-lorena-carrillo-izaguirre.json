@@ -1,0 +1,537 @@
+{
+  "meta": {
+    "firstName": "LORENA",
+    "lastName": "CARRILLO IZAGUIRRE",
+    "email": "asistente@nemx.mx",
+    "schemaVersion": 1,
+    "exportedAt": "2026-06-10T23:09:25.883Z",
+    "tournament": "FIFA World Cup 2026"
+  },
+  "groupMatches": {
+    "A1": {
+      "hs": 2,
+      "as": 1
+    },
+    "A2": {
+      "hs": 2,
+      "as": 1
+    },
+    "A3": {
+      "hs": 1,
+      "as": 0
+    },
+    "A4": {
+      "hs": 1,
+      "as": 1
+    },
+    "A5": {
+      "hs": 0,
+      "as": 1
+    },
+    "A6": {
+      "hs": 1,
+      "as": 2
+    },
+    "B1": {
+      "hs": 2,
+      "as": 1
+    },
+    "B2": {
+      "hs": 2,
+      "as": 1
+    },
+    "B3": {
+      "hs": 1,
+      "as": 1
+    },
+    "B4": {
+      "hs": 2,
+      "as": 1
+    },
+    "B5": {
+      "hs": 3,
+      "as": 2
+    },
+    "B6": {
+      "hs": 1,
+      "as": 2
+    },
+    "C1": {
+      "hs": 2,
+      "as": 1
+    },
+    "C2": {
+      "hs": 1,
+      "as": 2
+    },
+    "C3": {
+      "hs": 2,
+      "as": 0
+    },
+    "C4": {
+      "hs": 2,
+      "as": 1
+    },
+    "C5": {
+      "hs": 1,
+      "as": 2
+    },
+    "C6": {
+      "hs": 2,
+      "as": 2
+    },
+    "D1": {
+      "hs": 2,
+      "as": 1
+    },
+    "D2": {
+      "hs": 2,
+      "as": 2
+    },
+    "D3": {
+      "hs": 1,
+      "as": 0
+    },
+    "D4": {
+      "hs": 2,
+      "as": 2
+    },
+    "D5": {
+      "hs": 1,
+      "as": 2
+    },
+    "D6": {
+      "hs": 2,
+      "as": 1
+    },
+    "E1": {
+      "hs": 3,
+      "as": 1
+    },
+    "E2": {
+      "hs": 1,
+      "as": 2
+    },
+    "E3": {
+      "hs": 2,
+      "as": 0
+    },
+    "E4": {
+      "hs": 1,
+      "as": 1
+    },
+    "E5": {
+      "hs": 1,
+      "as": 2
+    },
+    "E6": {
+      "hs": 1,
+      "as": 1
+    },
+    "F1": {
+      "hs": 1,
+      "as": 2
+    },
+    "F2": {
+      "hs": 1,
+      "as": 1
+    },
+    "F3": {
+      "hs": 1,
+      "as": 2
+    },
+    "F4": {
+      "hs": 1,
+      "as": 1
+    },
+    "F5": {
+      "hs": 2,
+      "as": 1
+    },
+    "F6": {
+      "hs": 1,
+      "as": 2
+    },
+    "G1": {
+      "hs": 2,
+      "as": 1
+    },
+    "G2": {
+      "hs": 1,
+      "as": 2
+    },
+    "G3": {
+      "hs": 1,
+      "as": 2
+    },
+    "G4": {
+      "hs": 1,
+      "as": 2
+    },
+    "G5": {
+      "hs": 1,
+      "as": 2
+    },
+    "G6": {
+      "hs": 0,
+      "as": 2
+    },
+    "H1": {
+      "hs": 2,
+      "as": 0
+    },
+    "H2": {
+      "hs": 1,
+      "as": 2
+    },
+    "H3": {
+      "hs": 2,
+      "as": 1
+    },
+    "H4": {
+      "hs": 1,
+      "as": 1
+    },
+    "H5": {
+      "hs": 1,
+      "as": 2
+    },
+    "H6": {
+      "hs": 1,
+      "as": 2
+    },
+    "I1": {
+      "hs": 2,
+      "as": 1
+    },
+    "I2": {
+      "hs": 0,
+      "as": 2
+    },
+    "I3": {
+      "hs": 2,
+      "as": 1
+    },
+    "I4": {
+      "hs": 2,
+      "as": 1
+    },
+    "I5": {
+      "hs": 2,
+      "as": 2
+    },
+    "I6": {
+      "hs": 0,
+      "as": 2
+    },
+    "J1": {
+      "hs": 2,
+      "as": 0
+    },
+    "J2": {
+      "hs": 1,
+      "as": 1
+    },
+    "J3": {
+      "hs": 3,
+      "as": 1
+    },
+    "J4": {
+      "hs": 1,
+      "as": 0
+    },
+    "J5": {
+      "hs": 0,
+      "as": 2
+    },
+    "J6": {
+      "hs": 1,
+      "as": 2
+    },
+    "K1": {
+      "hs": 1,
+      "as": 0
+    },
+    "K2": {
+      "hs": 1,
+      "as": 2
+    },
+    "K3": {
+      "hs": 2,
+      "as": 1
+    },
+    "K4": {
+      "hs": 2,
+      "as": 0
+    },
+    "K5": {
+      "hs": 2,
+      "as": 2
+    },
+    "K6": {
+      "hs": 1,
+      "as": 0
+    },
+    "L1": {
+      "hs": 2,
+      "as": 1
+    },
+    "L2": {
+      "hs": 1,
+      "as": 2
+    },
+    "L3": {
+      "hs": 2,
+      "as": 1
+    },
+    "L4": {
+      "hs": 2,
+      "as": 1
+    },
+    "L5": {
+      "hs": 1,
+      "as": 2
+    },
+    "L6": {
+      "hs": 1,
+      "as": 0
+    }
+  },
+  "groupTiebreaks": {
+    "C": [
+      "BRA",
+      "SCO",
+      "MAR",
+      "HAI"
+    ]
+  },
+  "thirdPlaceTiebreaks": [],
+  "knockout": {
+    "M73": {
+      "home": "KOR",
+      "away": "SUI",
+      "hs": 0,
+      "as": 2
+    },
+    "M74": {
+      "home": "GER",
+      "away": "MAR",
+      "hs": 3,
+      "as": 2
+    },
+    "M75": {
+      "home": "SWE",
+      "away": "SCO",
+      "hs": 2,
+      "as": 0
+    },
+    "M76": {
+      "home": "BRA",
+      "away": "TUN",
+      "hs": 3,
+      "as": 1
+    },
+    "M77": {
+      "home": "NOR",
+      "away": "JPN",
+      "hs": 2,
+      "as": 1
+    },
+    "M78": {
+      "home": "ECU",
+      "away": "FRA",
+      "hs": 1,
+      "as": 3
+    },
+    "M79": {
+      "home": "MEX",
+      "away": "KSA",
+      "hs": 2,
+      "as": 0
+    },
+    "M80": {
+      "home": "ENG",
+      "away": "IRQ",
+      "hs": 2,
+      "as": 0
+    },
+    "M81": {
+      "home": "USA",
+      "away": "CAN",
+      "hs": 2,
+      "as": 1
+    },
+    "M82": {
+      "home": "IRN",
+      "away": "JOR",
+      "hs": 2,
+      "as": 1
+    },
+    "M83": {
+      "home": "POR",
+      "away": "PAN",
+      "hs": 2,
+      "as": 0
+    },
+    "M84": {
+      "home": "ESP",
+      "away": "AUT",
+      "hs": 3,
+      "as": 1
+    },
+    "M85": {
+      "home": "QAT",
+      "away": "NZL",
+      "hs": 1,
+      "as": 0
+    },
+    "M86": {
+      "home": "ARG",
+      "away": "URU",
+      "hs": 2,
+      "as": 2,
+      "pens": {
+        "went": true,
+        "hs": 4,
+        "as": 3
+      }
+    },
+    "M87": {
+      "home": "COL",
+      "away": "CRO",
+      "hs": 2,
+      "as": 1
+    },
+    "M88": {
+      "home": "PAR",
+      "away": "BEL",
+      "hs": 2,
+      "as": 2,
+      "pens": {
+        "went": true,
+        "hs": 2,
+        "as": 3
+      }
+    },
+    "M89": {
+      "home": "GER",
+      "away": "NOR",
+      "hs": 2,
+      "as": 1
+    },
+    "M90": {
+      "home": "SUI",
+      "away": "SWE",
+      "hs": 3,
+      "as": 2
+    },
+    "M91": {
+      "home": "BRA",
+      "away": "FRA",
+      "hs": 4,
+      "as": 3
+    },
+    "M92": {
+      "home": "MEX",
+      "away": "ENG",
+      "hs": 1,
+      "as": 3
+    },
+    "M93": {
+      "home": "POR",
+      "away": "ESP",
+      "hs": 2,
+      "as": 4
+    },
+    "M94": {
+      "home": "USA",
+      "away": "IRN",
+      "hs": 2,
+      "as": 1
+    },
+    "M95": {
+      "home": "ARG",
+      "away": "BEL",
+      "hs": 3,
+      "as": 2
+    },
+    "M96": {
+      "home": "QAT",
+      "away": "COL",
+      "hs": 0,
+      "as": 2
+    },
+    "M97": {
+      "home": "GER",
+      "away": "SUI",
+      "hs": 3,
+      "as": 2
+    },
+    "M98": {
+      "home": "ESP",
+      "away": "USA",
+      "hs": 2,
+      "as": 0
+    },
+    "M99": {
+      "home": "BRA",
+      "away": "ENG",
+      "hs": 3,
+      "as": 2
+    },
+    "M100": {
+      "home": "ARG",
+      "away": "COL",
+      "hs": 3,
+      "as": 3,
+      "pens": {
+        "went": true,
+        "hs": 4,
+        "as": 3
+      }
+    },
+    "M101": {
+      "home": "GER",
+      "away": "ESP",
+      "hs": 2,
+      "as": 2,
+      "pens": {
+        "went": true,
+        "hs": 2,
+        "as": 4
+      }
+    },
+    "M102": {
+      "home": "BRA",
+      "away": "ARG",
+      "hs": 2,
+      "as": 3
+    },
+    "M103": {
+      "home": "GER",
+      "away": "BRA",
+      "hs": 2,
+      "as": 3
+    },
+    "M104": {
+      "home": "ESP",
+      "away": "ARG",
+      "hs": 2,
+      "as": 2,
+      "pens": {
+        "went": true,
+        "hs": 4,
+        "as": 3
+      }
+    }
+  },
+  "champion": "ESP",
+  "awards": {
+    "goldenBall": null,
+    "goldenBoot": null,
+    "goldenGlove": null,
+    "youngPlayer": null,
+    "fairPlay": null
+  },
+  "wildcards": {}
+}
