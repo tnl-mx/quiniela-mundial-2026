@@ -1,7 +1,8 @@
 {
   "groupMatches": {
     "A1": { "hs": 2, "as": 0 },
-    "A2": { "hs": 2, "as": 1 }
+    "A2": { "hs": 2, "as": 1 },
+    "B1": { "hs": 1, "as": 1 }
   },
   "knockout": {},
   "champion": null,
