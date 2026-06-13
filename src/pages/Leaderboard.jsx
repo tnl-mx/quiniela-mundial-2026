@@ -194,9 +194,6 @@ function State({ emoji, title, text }) {
 
 // ---------- Pantalla ----------
 
-// URL de la raiz (la app de quiniela) respetando el base path de Pages.
-const QUINIELA_URL = import.meta.env.BASE_URL ?? '/'
-
 export function Leaderboard({ tournamentId }) {
   const demo = tournamentId === 'demo'
   const {
@@ -259,10 +256,6 @@ export function Leaderboard({ tournamentId }) {
 
   return (
     <main className="lb-page">
-      <a className="lb-home-link" href={QUINIELA_URL}>
-        ← Ir a llenar tu quiniela
-      </a>
-
       <header className="lb-header">
         {/* Titulo grande FIJO (igual para todos los torneos) */}
         <h1 className="lb-title">QUINIELA MUNDIAL 2026</h1>

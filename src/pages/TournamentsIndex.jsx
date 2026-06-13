@@ -6,8 +6,6 @@ import { useEffect, useState } from 'react'
 import './TournamentsIndex.css'
 import { loadTournamentsConfig } from '../data/loaders.js'
 
-const QUINIELA_URL = import.meta.env.BASE_URL ?? '/'
-
 export function TournamentsIndex() {
   const [tournaments, setTournaments] = useState(null)
   const [error, setError] = useState(null)
@@ -52,10 +50,6 @@ export function TournamentsIndex() {
           ))}
         </ul>
       )}
-
-      <a className="ti-home-link" href={QUINIELA_URL}>
-        ← Ir a llenar tu quiniela
-      </a>
     </main>
   )
 }
