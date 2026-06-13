@@ -12,11 +12,12 @@
 // navegacion por estado interno (sin ruteo de URL todavia).
 // ============================================================================
 
-import { useState } from 'react'
+import { useState, useLayoutEffect } from 'react'
 import './Leaderboard.css'
 import { useLeaderboard } from '../data/useLeaderboard.js'
 import { PersonDetail } from './PersonDetail.jsx'
 import { EvolutionChart } from './EvolutionChart.jsx'
+import { readScroll, saveScroll } from '../data/scrollMemory.js'
 
 // Indicador de subio/bajo respecto a hace 4 partidos.
 function DeltaIndicator({ delta }) {
@@ -216,6 +217,23 @@ export function Leaderboard({ tournamentId }) {
   // Navegacion al detalle por persona (estado interno, sin ruteo de URL).
   const [selectedFile, setSelectedFile] = useState(null)
   const selectedIndex = rows.findIndex((r) => r.file === selectedFile)
+
+  // Restaura el scroll del leaderboard al volver (o al recargar dentro del TTL),
+  // cuando se esta mostrando la tabla y ya hay filas pintadas.
+  useLayoutEffect(() => {
+    if (selectedFile !== null || rows.length === 0) return
+    const y = readScroll(`lb:${tournamentId}`)
+    if (y == null) return
+    const raf = requestAnimationFrame(() => window.scrollTo(0, y))
+    return () => cancelAnimationFrame(raf)
+  }, [selectedFile, rows.length, tournamentId])
+
+  // Abre el detalle de una persona, recordando antes donde iba el leaderboard.
+  const openPerson = (r) => {
+    saveScroll(`lb:${tournamentId}`, window.scrollY)
+    setSelectedFile(r.file)
+  }
+
   if (selectedFile && selectedIndex !== -1) {
     return (
       <PersonDetail
@@ -225,6 +243,7 @@ export function Leaderboard({ tournamentId }) {
         teams={teams}
         realResults={realResults}
         demo={demo}
+        tournamentId={tournamentId}
         onBack={() => setSelectedFile(null)}
       />
     )
@@ -330,7 +349,7 @@ export function Leaderboard({ tournamentId }) {
                 row={row}
                 position={i + 1}
                 teams={teams}
-                onSelect={(r) => setSelectedFile(r.file)}
+                onSelect={openPerson}
               />
             ))}
           </section>

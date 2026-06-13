@@ -14,8 +14,11 @@
 // Vista PUBLICA: cualquiera puede ver la quiniela de cualquiera.
 // ============================================================================
 
+import { useEffect } from 'react'
 import './PersonDetail.css'
 import { resolveStandings, isGroupComplete } from '../logic/scoring.js'
+import { maxPlayedMatch, CHRONO_IDS } from '../logic/matchOrder.js'
+import { readScroll, saveScroll } from '../data/scrollMemory.js'
 
 const GROUP_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
 
@@ -112,10 +115,11 @@ function Pill({ icon, label, value }) {
 // Asi la pill de puntos y el marcador real quedan alineados entre filas, y la
 // pill de penales predichos (PEN x-y) NO descuadra (vive dentro del fixture).
 // `predPens` = "x-y" (sin prefijo); `points` = { tier, label, tooltip }.
-function MatchRow({ teams, home, away, predText, predPens, realText, points }) {
+// `played` = el partido ya tiene resultado real (oficial) -> se tinta la fila.
+function MatchRow({ teams, home, away, predText, predPens, realText, points, played, matchId }) {
   const flag = (c) => teams[c]?.flag ?? '🏳'
   return (
-    <div className="pd-match">
+    <div className={`pd-match ${played ? 'pd-match--played' : ''}`} data-match-id={matchId}>
       <div className="pd-fixture">
         <div className="pd-fixture__line">
           <span className="pd-team pd-team--home">
@@ -144,7 +148,7 @@ function MatchRow({ teams, home, away, predText, predPens, realText, points }) {
 
 // ---------- Vista ----------
 
-export function PersonDetail({ row, position, tournament, teams, realResults, demo = false, onBack }) {
+export function PersonDetail({ row, position, tournament, teams, realResults, demo = false, tournamentId, onBack }) {
   // Mapas de items por categoria para buscar rapido.
   const items = row.items ?? []
   const gm = {} // groupMatches por matchId
@@ -173,11 +177,63 @@ export function PersonDetail({ row, position, tournament, teams, realResults, de
   }
   const hasKnockout = koIds.length > 0
 
+  // ----- Posicionar el scroll al ABRIR la quiniela (una vez por persona) -----
+  // Prioridad: 1) memoria de scroll de esta persona (si no vencio);
+  //            2) ir al partido oficial mas reciente y resaltarlo;
+  //            3) si nada se ha jugado, ir al inicio.
+  // Va dentro de requestAnimationFrame para correr DESPUES de pintar el detalle
+  // (asi nunca hereda el scroll del leaderboard).
+  useEffect(() => {
+    const memKey = `person:${tournamentId}:${row.file}`
+    const raf = requestAnimationFrame(() => {
+      const savedY = readScroll(memKey)
+      if (savedY != null) {
+        window.scrollTo(0, savedY)
+        return
+      }
+      const n = maxPlayedMatch(realResults)
+      if (n > 0) {
+        const id = CHRONO_IDS[n - 1]
+        const el = document.querySelector(`[data-match-id="${id}"]`)
+        if (el) {
+          el.scrollIntoView({ block: 'center', behavior: 'auto' })
+          el.classList.add('pd-match--latest')
+          setTimeout(() => el.classList.remove('pd-match--latest'), 1600)
+          return
+        }
+      }
+      window.scrollTo(0, 0)
+    })
+    return () => cancelAnimationFrame(raf)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [row.file, tournamentId])
+
+  // ----- Guardar la posicion de scroll mientras navega (throttle con rAF) -----
+  useEffect(() => {
+    const memKey = `person:${tournamentId}:${row.file}`
+    let raf = 0
+    const onScroll = () => {
+      if (raf) return
+      raf = requestAnimationFrame(() => {
+        raf = 0
+        saveScroll(memKey, window.scrollY)
+      })
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      if (raf) cancelAnimationFrame(raf)
+    }
+  }, [row.file, tournamentId])
+
   return (
     <main className="pd-page">
-      <button type="button" className="pd-back" onClick={onBack}>
-        ← Volver al leaderboard
-      </button>
+      <div className="pd-backbar">
+        <button type="button" className="pd-back" onClick={onBack}>
+          <span className="pd-back__arrow" aria-hidden="true">←</span>
+          Volver al leaderboard
+        </button>
+      </div>
 
       {demo && <div className="pd-demo-flag">⚠ Modo demo · datos de ejemplo</div>}
 
@@ -229,6 +285,8 @@ export function PersonDetail({ row, position, tournament, teams, realResults, de
                     predText={fmt(p) ?? '—'}
                     realText={item ? fmt(item.actual) : null}
                     points={groupPoints(item)}
+                    played={!!item}
+                    matchId={m.id}
                   />
                 )
               })}
@@ -307,6 +365,8 @@ export function PersonDetail({ row, position, tournament, teams, realResults, de
                     predPens={predPens}
                     realText={realText}
                     points={koPoints(mItem, pItem, x2)}
+                    played={!!mItem}
+                    matchId={id}
                   />
                 )
               })}
@@ -331,6 +391,7 @@ export function PersonDetail({ row, position, tournament, teams, realResults, de
                   : null
               }
               points={champPoints(champItem)}
+              played={!!champItem && champItem.status !== 'pending'}
             />
           </div>
         ) : (
