@@ -155,3 +155,6 @@ vite.config.ts.timestamp-*
 public/data/predictions-demo/
 public/data/real-results-demo.json
 scripts/generar-demo.js
+
+# Archivos de pronosticos exportados para WhatsApp (locales, no se suben)
+*-pronosticos.txt
