@@ -198,7 +198,7 @@ export function PersonDetail({ row, position, tournament, teams, realResults, de
         if (el) {
           el.scrollIntoView({ block: 'center', behavior: 'auto' })
           el.classList.add('pd-match--latest')
-          setTimeout(() => el.classList.remove('pd-match--latest'), 1600)
+          setTimeout(() => el.classList.remove('pd-match--latest'), 2100)
           return
         }
       }

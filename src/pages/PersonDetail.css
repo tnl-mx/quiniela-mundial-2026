@@ -211,25 +211,39 @@
   border-bottom: none;
 }
 
-/* Partido ya OFICIAL (con resultado real): tinte sutil verde marca + barra de
-   acento a la izquierda (inset, para no desalinear respecto a los por jugar). */
+/* Partido ya OFICIAL (con resultado real): tinte verde marca + barra de acento
+   a la izquierda (inset, para no desalinear respecto a los por jugar). */
 .pd-match--played {
-  background: rgba(14, 122, 79, 0.06);
+  background: rgba(14, 122, 79, 0.12);
   box-shadow: inset 3px 0 0 var(--color-brand);
 }
 
-/* Resalte temporal del partido mas reciente al abrir la quiniela (Parte 3). */
+/* Resalte temporal del partido mas reciente al abrir la quiniela (Parte 3).
+   Late dos veces en verde fuerte y aterriza en el verde suave de los oficiales
+   (verde, no rojo/magenta, para que no se lea como "error"). */
 .pd-match--latest {
-  animation: pd-latest-pulse 1.5s ease-out;
+  animation: pd-latest-pulse 1.9s ease-out;
 }
 @keyframes pd-latest-pulse {
   0% {
-    background: var(--color-accent-soft);
-    box-shadow: inset 3px 0 0 var(--color-accent);
+    background: rgba(14, 122, 79, 0.5);
+    box-shadow: inset 4px 0 0 var(--color-brand);
+  }
+  20% {
+    background: rgba(14, 122, 79, 0.14);
+    box-shadow: inset 4px 0 0 var(--color-brand);
+  }
+  45% {
+    background: rgba(14, 122, 79, 0.5);
+    box-shadow: inset 4px 0 0 var(--color-brand);
+  }
+  70% {
+    background: rgba(14, 122, 79, 0.14);
+    box-shadow: inset 4px 0 0 var(--color-brand);
   }
   100% {
-    background: transparent;
-    box-shadow: none;
+    background: rgba(14, 122, 79, 0.12);
+    box-shadow: inset 3px 0 0 var(--color-brand);
   }
 }
 
