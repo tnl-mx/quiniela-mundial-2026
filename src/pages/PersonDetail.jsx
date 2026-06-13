@@ -17,7 +17,7 @@
 import { useEffect } from 'react'
 import './PersonDetail.css'
 import { resolveStandings, isGroupComplete } from '../logic/scoring.js'
-import { maxPlayedMatch, CHRONO_IDS } from '../logic/matchOrder.js'
+import { latestPlayedMatchId } from '../logic/matchOrder.js'
 import { readScroll, saveScroll } from '../data/scrollMemory.js'
 
 const GROUP_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
@@ -191,9 +191,8 @@ export function PersonDetail({ row, position, tournament, teams, realResults, de
         window.scrollTo(0, savedY)
         return
       }
-      const n = maxPlayedMatch(realResults)
-      if (n > 0) {
-        const id = CHRONO_IDS[n - 1]
+      const id = latestPlayedMatchId(realResults)
+      if (id) {
         const el = document.querySelector(`[data-match-id="${id}"]`)
         if (el) {
           el.scrollIntoView({ block: 'center', behavior: 'auto' })

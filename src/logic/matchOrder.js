@@ -84,6 +84,22 @@ export function maxPlayedMatch(realResults) {
   return max
 }
 
+// Id del partido jugado mas RECIENTE por orden de captura (el ultimo agregado
+// al real-results), NO por numero de match. Asi resaltamos lo que se acaba de
+// subir, aunque se haya capturado fuera del orden cronologico. La eliminatoria
+// va despues de grupos en el tiempo, asi que tiene prioridad. null si nada.
+export function latestPlayedMatchId(realResults) {
+  const ko = Object.keys(realResults.knockout ?? {}).filter((id) =>
+    isValidScore(realResults.knockout[id]),
+  )
+  if (ko.length) return ko[ko.length - 1]
+  const g = Object.keys(realResults.groupMatches ?? {}).filter((id) =>
+    isValidScore(realResults.groupMatches[id]),
+  )
+  if (g.length) return g[g.length - 1]
+  return null
+}
+
 // Puntos de corte (eje X) en bloques de `size` partidos, SOLO hasta el ultimo
 // jugado. Incluye el ultimo jugado como punto final aunque no caiga en multiplo.
 //   maxPlayed=12 -> [4,8,12] · maxPlayed=10 -> [4,8,10] · maxPlayed=2 -> [2]

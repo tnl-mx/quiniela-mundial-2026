@@ -8,6 +8,7 @@ import {
   cropRealResults,
   maxPlayedMatch,
   blockEndpoints,
+  latestPlayedMatchId,
 } from './matchOrder.js'
 import { scorePrediction } from './scoring.js'
 import { buildBracket } from './bracket.js'
@@ -108,5 +109,35 @@ describe('cropRealResults + monotonia', () => {
     expect(maxPlayedMatch(full)).toBe(72) // todos los grupos
     const partial = { groupMatches: { A1: { hs: 1, as: 0 }, B1: { hs: 0, as: 0 } }, knockout: {} }
     expect(maxPlayedMatch(partial)).toBe(3) // B1 = match 3
+  })
+})
+
+describe('latestPlayedMatchId (ultimo capturado, no el de mayor numero)', () => {
+  it('devuelve el ultimo grupo agregado aunque tenga numero de match menor', () => {
+    // Capturados en este orden: A1, A2, B1, D1 (match 7), B2 (match 4).
+    const rr = {
+      groupMatches: {
+        A1: { hs: 2, as: 0 },
+        A2: { hs: 2, as: 1 },
+        B1: { hs: 1, as: 1 },
+        D1: { hs: 4, as: 1 },
+        B2: { hs: 1, as: 1 },
+      },
+      knockout: {},
+    }
+    // El ultimo agregado es B2, aunque D1 tenga numero de match mas alto.
+    expect(latestPlayedMatchId(rr)).toBe('B2')
+  })
+
+  it('la eliminatoria tiene prioridad sobre grupos', () => {
+    const rr = {
+      groupMatches: { A1: { hs: 1, as: 0 } },
+      knockout: { M73: { home: 'MEX', away: 'KOR', hs: 1, as: 0 } },
+    }
+    expect(latestPlayedMatchId(rr)).toBe('M73')
+  })
+
+  it('null si no hay nada jugado', () => {
+    expect(latestPlayedMatchId({ groupMatches: {}, knockout: {} })).toBeNull()
   })
 })
