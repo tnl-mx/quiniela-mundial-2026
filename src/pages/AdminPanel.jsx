@@ -25,9 +25,11 @@ import { buildRealResultsJson } from '../logic/realResultsExport.js'
 import { isStaleKnockout } from '../logic/knockoutStale.js'
 import { mergeRealResults, findConflicts } from '../logic/realResultsMerge.js'
 import { fillAllRemainingAtRandom } from '../logic/randomFill.js'
+import { publishRealResults } from '../logic/githubPublish.js'
 
 const PIN = '333221'
 const AUTH_KEY = 'quiniela-mundial-2026:admin-auth'
+const GH_TOKEN_KEY = 'quiniela-mundial-2026:gh-token'
 const QUINIELA_URL = import.meta.env.BASE_URL ?? '/'
 
 const KO_ROUNDS = [
@@ -314,6 +316,12 @@ export function AdminPanel() {
   const conflictsRef = useRef(null)
   const [keptLocal, setKeptLocal] = useState(() => new Set())
 
+  // Publicar a GitHub: token (solo en este dispositivo) + estado de publicacion.
+  const [ghToken, setGhToken] = useState(() => {
+    try { return window.localStorage.getItem(GH_TOKEN_KEY) || '' } catch { return '' }
+  })
+  const [publishState, setPublishState] = useState({ loading: false, ok: null, error: null, commitUrl: null })
+
   if (!authed) return <PinGate onUnlock={() => setAuthed(true)} />
   if (dataset.loading) return <main className="adm-page"><p>Cargando datos del torneo…</p></main>
   if (dataset.error) return <main className="adm-page"><p>Error al cargar datos: {dataset.error.message}</p></main>
@@ -397,6 +405,31 @@ export function AdminPanel() {
   }
   const wipe = () => {
     if (window.confirm('¿Vaciar TODO tu borrador local? (no afecta el archivo oficial ni lo ya subido)')) clearAll()
+  }
+
+  // Token: se guarda solo en este dispositivo (localStorage), nunca en el repo.
+  const onTokenChange = (value) => {
+    setGhToken(value)
+    try { window.localStorage.setItem(GH_TOKEN_KEY, value) } catch { /* noop */ }
+    setPublishState({ loading: false, ok: null, error: null, commitUrl: null })
+  }
+
+  // Publica el mismo JSON (oficial + mis cambios) directo a main via API.
+  const publish = async () => {
+    if (!ghToken.trim()) {
+      setPublishState({ loading: false, ok: false, error: 'Captura primero tu token de GitHub.', commitUrl: null })
+      return
+    }
+    if (counts.conflict > 0 && !window.confirm(
+      `Tienes ${counts.conflict} conflicto(s) sin resolver. Se publicará el valor OFICIAL en esos. ¿Publicar igual?`,
+    )) return
+    setPublishState({ loading: true, ok: null, error: null, commitUrl: null })
+    const res = await publishRealResults({ token: ghToken.trim(), json })
+    if (res.ok) {
+      setPublishState({ loading: false, ok: true, error: null, commitUrl: res.commitUrl })
+    } else {
+      setPublishState({ loading: false, ok: false, error: res.error || 'No se pudo publicar.', commitUrl: null })
+    }
   }
 
   const koLive = [...bracket.r32, ...bracket.r16, ...bracket.qf, ...bracket.sf, ...bracket.third, ...bracket.final]
@@ -509,6 +542,40 @@ export function AdminPanel() {
           </div>
         ) : (
           <p className="adm-muted">Se definirá automáticamente al capturar la final.</p>
+        )}
+      </section>
+
+      {/* Publicar a GitHub: escribe real-results.json directo a main (1 toque) */}
+      <section className="adm-section adm-publish">
+        <h2 className="adm-section__title">Publicar a GitHub</h2>
+        <label className="adm-publish__label" htmlFor="adm-gh-token">Token de GitHub</label>
+        <input
+          id="adm-gh-token"
+          type="password"
+          className="adm-publish__input"
+          value={ghToken}
+          onChange={(e) => onTokenChange(e.target.value)}
+          placeholder="github_pat_..."
+          autoComplete="off"
+        />
+        <p className="adm-publish__hint">
+          Se guarda solo en este dispositivo. Token fine-grained con Contents: Read and write sobre este repo.
+        </p>
+        <div className="adm-publish__row">
+          <button type="button" className="btn btn-primary" onClick={publish} disabled={publishState.loading}>
+            {publishState.loading ? 'Publicando…' : '🚀 Publicar a GitHub'}
+          </button>
+        </div>
+        {publishState.ok && (
+          <p className="adm-publish__ok">
+            ✓ Publicado. El sitio se actualiza en 1 o 2 minutos.
+            {publishState.commitUrl && (
+              <> · <a href={publishState.commitUrl} target="_blank" rel="noreferrer">ver commit</a></>
+            )}
+          </p>
+        )}
+        {publishState.ok === false && publishState.error && (
+          <p className="adm-publish__error">⚠ {publishState.error}</p>
         )}
       </section>
 

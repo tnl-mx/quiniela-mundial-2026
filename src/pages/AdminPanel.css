@@ -473,3 +473,44 @@
 .adm-gate__home:hover {
   text-decoration: underline;
 }
+
+/* ---------- Publicar a GitHub ---------- */
+.adm-publish__label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-1);
+}
+.adm-publish__input {
+  width: 100%;
+  max-width: 480px;
+  font: inherit;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+}
+.adm-publish__hint {
+  margin: var(--space-1) 0 var(--space-3);
+  font-size: 0.75rem;
+  color: var(--color-text-subtle);
+}
+.adm-publish__row {
+  display: flex;
+  gap: var(--space-2);
+}
+.adm-publish__ok {
+  margin: var(--space-3) 0 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-brand-dark);
+}
+.adm-publish__ok a {
+  color: var(--color-brand);
+}
+.adm-publish__error {
+  margin: var(--space-3) 0 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-danger);
+}
