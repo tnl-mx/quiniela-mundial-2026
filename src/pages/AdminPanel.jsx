@@ -326,6 +326,17 @@ export function AdminPanel() {
     try { return !(window.localStorage.getItem(GH_TOKEN_KEY) || '') } catch { return true }
   })
 
+  // El toast de EXITO se autodesvanece (vuelve el FAB a idle). El de ERROR
+  // permanece hasta que se toque para cerrarlo.
+  useEffect(() => {
+    if (publishState.ok !== true) return
+    const t = setTimeout(
+      () => setPublishState({ loading: false, ok: null, error: null, commitUrl: null }),
+      4000,
+    )
+    return () => clearTimeout(t)
+  }, [publishState.ok])
+
   if (!authed) return <PinGate onUnlock={() => setAuthed(true)} />
   if (dataset.loading) return <main className="adm-page"><p>Cargando datos del torneo…</p></main>
   if (dataset.error) return <main className="adm-page"><p>Error al cargar datos: {dataset.error.message}</p></main>
@@ -435,36 +446,12 @@ export function AdminPanel() {
       setPublishState({ loading: false, ok: false, error: res.error || 'No se pudo publicar.', commitUrl: null })
     }
   }
+  const dismissToast = () => setPublishState({ loading: false, ok: null, error: null, commitUrl: null })
 
   const koLive = [...bracket.r32, ...bracket.r16, ...bracket.qf, ...bracket.sf, ...bracket.third, ...bracket.final]
 
   return (
     <main className="adm-page">
-      {/* Barra PEGAJOSA: lo unico sticky. Solo Publicar + estado. */}
-      <div className="adm-publishbar">
-        <button
-          type="button"
-          className="btn btn-primary adm-publishbar__btn"
-          onClick={publish}
-          disabled={publishState.loading}
-        >
-          {publishState.loading ? 'Publicando…' : '🚀 Publicar a GitHub'}
-        </button>
-        <div className="adm-publishbar__status">
-          {publishState.ok && (
-            <span className="adm-publish__ok">
-              ✓ Publicado. El sitio se actualiza en 1 o 2 minutos.
-              {publishState.commitUrl && (
-                <> · <a href={publishState.commitUrl} target="_blank" rel="noreferrer">ver commit</a></>
-              )}
-            </span>
-          )}
-          {publishState.ok === false && publishState.error && (
-            <span className="adm-publish__error">⚠ {publishState.error}</span>
-          )}
-        </div>
-      </div>
-
       <header className="adm-bar">
         <div className="adm-bar__title">
           <strong>Panel del organizador</strong>
@@ -609,6 +596,30 @@ export function AdminPanel() {
         )}
       </section>
 
+      {/* Toast (encima del FAB): exito se autodesvanece; error queda hasta cerrarlo. */}
+      {publishState.ok && (
+        <div className="adm-toast adm-toast--ok" role="status">
+          ✓ Publicado
+          {publishState.commitUrl && (
+            <> · <a href={publishState.commitUrl} target="_blank" rel="noreferrer">ver commit</a></>
+          )}
+        </div>
+      )}
+      {publishState.ok === false && publishState.error && (
+        <button type="button" className="adm-toast adm-toast--error" onClick={dismissToast} aria-label="Cerrar aviso">
+          ⚠ {publishState.error} <span className="adm-toast__close" aria-hidden="true">✕</span>
+        </button>
+      )}
+
+      {/* FAB: disparador de Publicar, comodo para el pulgar en movil. */}
+      <button
+        type="button"
+        className={`adm-fab ${publishState.ok === false ? 'adm-fab--error' : ''}`}
+        onClick={publish}
+        disabled={publishState.loading}
+      >
+        {publishState.loading ? 'Publicando…' : publishState.ok ? '✓ Publicado' : '🚀 Publicar'}
+      </button>
     </main>
   )
 }

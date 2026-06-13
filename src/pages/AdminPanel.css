@@ -6,7 +6,8 @@
 .adm-page {
   max-width: 880px;
   margin: 0 auto;
-  padding: var(--space-4) var(--space-4) var(--space-10);
+  /* padding inferior generoso para que el FAB no tape el ultimo partido */
+  padding: var(--space-4) var(--space-4) 6rem;
 }
 
 /* ---------- Botones (scopeados al panel para no tocar los globales) ---------- */
@@ -56,37 +57,7 @@
   color: var(--color-danger);
 }
 
-/* ---------- Barra Publicar (PEGAJOSA: lo unico sticky) ---------- */
-.adm-publishbar {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2) var(--space-3);
-  /* full-bleed: cubre todo el ancho de la columna para que el contenido pase
-     por debajo sin transparentarse. */
-  margin: 0 calc(-1 * var(--space-4)) var(--space-3);
-  padding: var(--space-2) var(--space-4);
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
-}
-.adm-publishbar__btn {
-  flex: 0 0 auto;
-}
-.adm-publishbar__status {
-  flex: 1 1 100%;
-  font-size: 0.8rem;
-}
-@media (min-width: 560px) {
-  .adm-publishbar__status {
-    flex: 1 1 auto;
-  }
-}
-
-/* ---------- Barra superior (info, ya NO sticky) ---------- */
+/* ---------- Barra superior (info, NO sticky) ---------- */
 .adm-bar {
   display: flex;
   flex-wrap: wrap;
@@ -570,4 +541,73 @@
   align-items: center;
   gap: var(--space-2);
   margin-left: auto;
+}
+
+/* ---------- FAB Publicar (flotante abajo a la derecha) ---------- */
+.adm-fab {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 50;
+  appearance: none;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--color-brand);
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  font-size: 0.95rem;
+  padding: 12px 20px;
+  cursor: pointer;
+  box-shadow: var(--shadow-lg);
+  transition: filter 0.12s ease, background-color 0.12s ease;
+}
+.adm-fab:hover {
+  filter: brightness(0.96);
+}
+.adm-fab:disabled {
+  opacity: 0.75;
+  cursor: default;
+}
+.adm-fab--error {
+  background: var(--color-danger);
+}
+
+/* Toast chico justo encima del FAB (no a pantalla completa). */
+.adm-toast {
+  position: fixed;
+  right: 18px;
+  bottom: 70px;
+  z-index: 50;
+  max-width: min(320px, calc(100vw - 36px));
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.35;
+  box-shadow: var(--shadow-lg);
+}
+.adm-toast--ok {
+  background: var(--color-text);
+  color: #fff;
+}
+.adm-toast--ok a {
+  color: #fff;
+  text-decoration: underline;
+}
+.adm-toast--error {
+  appearance: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  background: var(--color-danger);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.adm-toast__close {
+  margin-left: auto;
+  font-weight: 800;
+  opacity: 0.9;
 }
