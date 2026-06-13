@@ -56,11 +56,38 @@
   color: var(--color-danger);
 }
 
-/* ---------- Barra superior ---------- */
-.adm-bar {
+/* ---------- Barra Publicar (PEGAJOSA: lo unico sticky) ---------- */
+.adm-publishbar {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 40;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  /* full-bleed: cubre todo el ancho de la columna para que el contenido pase
+     por debajo sin transparentarse. */
+  margin: 0 calc(-1 * var(--space-4)) var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+.adm-publishbar__btn {
+  flex: 0 0 auto;
+}
+.adm-publishbar__status {
+  flex: 1 1 100%;
+  font-size: 0.8rem;
+}
+@media (min-width: 560px) {
+  .adm-publishbar__status {
+    flex: 1 1 auto;
+  }
+}
+
+/* ---------- Barra superior (info, ya NO sticky) ---------- */
+.adm-bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -513,4 +540,34 @@
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--color-danger);
+}
+
+/* ---------- Bloque de herramientas (token + acciones secundarias, no sticky) ---------- */
+.adm-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3) var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+.adm-tools__token {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+.adm-tools__token-saved {
+  flex: 1 1 280px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+.adm-tools__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: auto;
 }

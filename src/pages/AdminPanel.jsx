@@ -321,6 +321,10 @@ export function AdminPanel() {
     try { return window.localStorage.getItem(GH_TOKEN_KEY) || '' } catch { return '' }
   })
   const [publishState, setPublishState] = useState({ loading: false, ok: null, error: null, commitUrl: null })
+  // Token colapsado cuando ya hay uno guardado (solo se captura una vez).
+  const [tokenEditing, setTokenEditing] = useState(() => {
+    try { return !(window.localStorage.getItem(GH_TOKEN_KEY) || '') } catch { return true }
+  })
 
   if (!authed) return <PinGate onUnlock={() => setAuthed(true)} />
   if (dataset.loading) return <main className="adm-page"><p>Cargando datos del torneo…</p></main>
@@ -436,6 +440,31 @@ export function AdminPanel() {
 
   return (
     <main className="adm-page">
+      {/* Barra PEGAJOSA: lo unico sticky. Solo Publicar + estado. */}
+      <div className="adm-publishbar">
+        <button
+          type="button"
+          className="btn btn-primary adm-publishbar__btn"
+          onClick={publish}
+          disabled={publishState.loading}
+        >
+          {publishState.loading ? 'Publicando…' : '🚀 Publicar a GitHub'}
+        </button>
+        <div className="adm-publishbar__status">
+          {publishState.ok && (
+            <span className="adm-publish__ok">
+              ✓ Publicado. El sitio se actualiza en 1 o 2 minutos.
+              {publishState.commitUrl && (
+                <> · <a href={publishState.commitUrl} target="_blank" rel="noreferrer">ver commit</a></>
+              )}
+            </span>
+          )}
+          {publishState.ok === false && publishState.error && (
+            <span className="adm-publish__error">⚠ {publishState.error}</span>
+          )}
+        </div>
+      </div>
+
       <header className="adm-bar">
         <div className="adm-bar__title">
           <strong>Panel del organizador</strong>
@@ -447,11 +476,46 @@ export function AdminPanel() {
           {counts.conflict > 0 && <span className="adm-bar__stale"> · Conflictos: {counts.conflict}</span>}
         </div>
         <div className="adm-bar__actions">
-          <button type="button" className="btn btn-primary" onClick={download}>⬇ Descargar JSON</button>
-          <button type="button" className="btn btn-secondary" onClick={copy}>Copiar</button>
           <button type="button" className="adm-link" onClick={logout}>Salir</button>
         </div>
       </header>
+
+      {/* Token (se captura una vez) + acciones secundarias (no sticky). */}
+      <section className="adm-tools">
+        {tokenEditing ? (
+          <div className="adm-tools__token">
+            <label className="adm-publish__label" htmlFor="adm-gh-token">Token de GitHub</label>
+            <input
+              id="adm-gh-token"
+              type="password"
+              className="adm-publish__input"
+              value={ghToken}
+              onChange={(e) => onTokenChange(e.target.value)}
+              placeholder="github_pat_..."
+              autoComplete="off"
+            />
+            <p className="adm-publish__hint">
+              Se guarda solo en este dispositivo. Token fine-grained con Contents: Read and write sobre este repo.
+              {ghToken.trim() && (
+                <>
+                  {' '}
+                  <button type="button" className="adm-link" onClick={() => setTokenEditing(false)}>listo</button>
+                </>
+              )}
+            </p>
+          </div>
+        ) : (
+          <div className="adm-tools__token-saved">
+            Token guardado ✓ ·{' '}
+            <button type="button" className="adm-link" onClick={() => setTokenEditing(true)}>cambiar</button>
+          </div>
+        )}
+        <div className="adm-tools__actions">
+          <button type="button" className="btn btn-secondary" onClick={download}>⬇ Descargar JSON</button>
+          <button type="button" className="btn btn-secondary" onClick={copy}>Copiar</button>
+          <button type="button" className="adm-link adm-danger" onClick={wipe}>Vaciar borrador</button>
+        </div>
+      </section>
 
       <p className="adm-note">
         Base: el <code>real-results.json</code> ya subido. Tus cambios se guardan local hasta que descargues el JSON y lo subas por commit.
@@ -545,45 +609,6 @@ export function AdminPanel() {
         )}
       </section>
 
-      {/* Publicar a GitHub: escribe real-results.json directo a main (1 toque) */}
-      <section className="adm-section adm-publish">
-        <h2 className="adm-section__title">Publicar a GitHub</h2>
-        <label className="adm-publish__label" htmlFor="adm-gh-token">Token de GitHub</label>
-        <input
-          id="adm-gh-token"
-          type="password"
-          className="adm-publish__input"
-          value={ghToken}
-          onChange={(e) => onTokenChange(e.target.value)}
-          placeholder="github_pat_..."
-          autoComplete="off"
-        />
-        <p className="adm-publish__hint">
-          Se guarda solo en este dispositivo. Token fine-grained con Contents: Read and write sobre este repo.
-        </p>
-        <div className="adm-publish__row">
-          <button type="button" className="btn btn-primary" onClick={publish} disabled={publishState.loading}>
-            {publishState.loading ? 'Publicando…' : '🚀 Publicar a GitHub'}
-          </button>
-        </div>
-        {publishState.ok && (
-          <p className="adm-publish__ok">
-            ✓ Publicado. El sitio se actualiza en 1 o 2 minutos.
-            {publishState.commitUrl && (
-              <> · <a href={publishState.commitUrl} target="_blank" rel="noreferrer">ver commit</a></>
-            )}
-          </p>
-        )}
-        {publishState.ok === false && publishState.error && (
-          <p className="adm-publish__error">⚠ {publishState.error}</p>
-        )}
-      </section>
-
-      <section className="adm-section adm-footer">
-        <button type="button" className="btn btn-primary" onClick={download}>⬇ Descargar real-results.json</button>
-        <button type="button" className="btn btn-secondary" onClick={copy}>Copiar al portapapeles</button>
-        <button type="button" className="adm-link adm-danger" onClick={wipe}>Vaciar borrador</button>
-      </section>
     </main>
   )
 }
