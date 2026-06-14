@@ -178,22 +178,28 @@ export function PersonDetail({ row, position, tournament, teams, realResults, de
   const hasKnockout = koIds.length > 0
 
   // ----- Posicionar el scroll al ABRIR la quiniela (una vez por persona) -----
-  // Prioridad: 1) memoria de scroll de esta persona (si no vencio);
-  //            2) ir al partido oficial mas reciente y resaltarlo;
-  //            3) si nada se ha jugado, ir al inicio.
+  // Prioridad: 1) si hay memoria y NO entro un resultado nuevo desde entonces,
+  //               restaura donde te quedaste;
+  //            2) si hay un resultado NUEVO (o no hay memoria valida): ve al
+  //               ultimo resultado capturado y resaltalo;
+  //            3) si nada se ha jugado, ve al inicio.
+  // El "resultado nuevo" se detecta comparando el tag guardado (el ultimo
+  // resultado en ese momento) contra el ultimo resultado actual.
   // Va dentro de requestAnimationFrame para correr DESPUES de pintar el detalle
   // (asi nunca hereda el scroll del leaderboard).
   useEffect(() => {
     const memKey = `person:${tournamentId}:${row.file}`
+    const currentLatest = latestPlayedMatchId(realResults)
     const raf = requestAnimationFrame(() => {
-      const savedY = readScroll(memKey)
-      if (savedY != null) {
-        window.scrollTo(0, savedY)
+      const mem = readScroll(memKey)
+      // Solo restauramos la memoria si NO hay un score nuevo (mismo ultimo
+      // resultado que cuando se guardo).
+      if (mem && mem.tag === currentLatest) {
+        window.scrollTo(0, mem.y)
         return
       }
-      const id = latestPlayedMatchId(realResults)
-      if (id) {
-        const el = document.querySelector(`[data-match-id="${id}"]`)
+      if (currentLatest) {
+        const el = document.querySelector(`[data-match-id="${currentLatest}"]`)
         if (el) {
           el.scrollIntoView({ block: 'center', behavior: 'auto' })
           el.classList.add('pd-match--latest')
@@ -208,14 +214,17 @@ export function PersonDetail({ row, position, tournament, teams, realResults, de
   }, [row.file, tournamentId])
 
   // ----- Guardar la posicion de scroll mientras navega (throttle con rAF) -----
+  // Junto a la posicion guardamos el ultimo resultado actual (tag), para poder
+  // detectar despues si entro un score nuevo.
   useEffect(() => {
     const memKey = `person:${tournamentId}:${row.file}`
+    const currentLatest = latestPlayedMatchId(realResults)
     let raf = 0
     const onScroll = () => {
       if (raf) return
       raf = requestAnimationFrame(() => {
         raf = 0
-        saveScroll(memKey, window.scrollY)
+        saveScroll(memKey, window.scrollY, currentLatest)
       })
     }
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -223,6 +232,7 @@ export function PersonDetail({ row, position, tournament, teams, realResults, de
       window.removeEventListener('scroll', onScroll)
       if (raf) cancelAnimationFrame(raf)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [row.file, tournamentId])
 
   return (

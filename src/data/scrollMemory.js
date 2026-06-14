@@ -10,17 +10,19 @@ function storageKey(key) {
   return `q26:scroll:${key}`
 }
 
-// Guarda la posicion vertical (y) bajo una clave, con marca de tiempo.
-export function saveScroll(key, y) {
+// Guarda la posicion vertical (y) bajo una clave, con marca de tiempo y un
+// `tag` opcional (una firma del estado, p. ej. el ultimo resultado capturado).
+// El tag permite invalidar la memoria cuando ese estado cambia.
+export function saveScroll(key, y, tag = null) {
   try {
-    window.localStorage.setItem(storageKey(key), JSON.stringify({ y, at: Date.now() }))
+    window.localStorage.setItem(storageKey(key), JSON.stringify({ y, at: Date.now(), tag }))
   } catch {
     /* localStorage no disponible: ignoramos en silencio */
   }
 }
 
-// Lee la posicion guardada. Devuelve null si no existe o si ya vencio (y de
-// paso borra la entrada vencida).
+// Lee la posicion guardada. Devuelve { y, tag } o null si no existe o vencio
+// (y de paso borra la entrada vencida).
 export function readScroll(key) {
   try {
     const raw = window.localStorage.getItem(storageKey(key))
@@ -38,7 +40,7 @@ export function readScroll(key) {
       }
       return null
     }
-    return data.y
+    return { y: data.y, tag: data.tag ?? null }
   } catch {
     return null
   }

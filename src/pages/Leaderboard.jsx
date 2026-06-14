@@ -219,9 +219,9 @@ export function Leaderboard({ tournamentId }) {
   // cuando se esta mostrando la tabla y ya hay filas pintadas.
   useLayoutEffect(() => {
     if (selectedFile !== null || rows.length === 0) return
-    const y = readScroll(`lb:${tournamentId}`)
-    if (y == null) return
-    const raf = requestAnimationFrame(() => window.scrollTo(0, y))
+    const mem = readScroll(`lb:${tournamentId}`)
+    if (!mem) return
+    const raf = requestAnimationFrame(() => window.scrollTo(0, mem.y))
     return () => cancelAnimationFrame(raf)
   }, [selectedFile, rows.length, tournamentId])
 
