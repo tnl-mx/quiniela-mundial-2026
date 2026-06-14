@@ -279,10 +279,12 @@ export function Leaderboard({ tournamentId }) {
 
   // Stats rotativas "Dato del momento" (memoizadas: solo recalcula al cambiar
   // resultados o quinielas; escalador reconstruye rankings con el motor).
-  const quirks = useMemo(
-    () => buildQuirkStats({ rows, realResults, tournament, teams, annexCOptions, scoring }),
-    [rows, realResults, tournament, teams, annexCOptions, scoring],
-  )
+  // Durante la carga realResults/rows aun no existen: devolvemos lista vacia
+  // para no tronar (las funciones leen realResults.groupMatches).
+  const quirks = useMemo(() => {
+    if (!realResults || rows.length === 0) return []
+    return buildQuirkStats({ rows, realResults, tournament, teams, annexCOptions, scoring })
+  }, [rows, realResults, tournament, teams, annexCOptions, scoring])
 
   if (selectedFile && selectedIndex !== -1) {
     return (

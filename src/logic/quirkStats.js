@@ -170,6 +170,8 @@ export function francotirador({ rows }) {
 }
 
 // Arma la lista de stats aplicables (descarta las que devuelven null).
+// Si todavia no hay resultados o quinielas, devuelve lista vacia sin tronar.
 export function buildQuirkStats(ctx) {
+  if (!ctx?.realResults || !ctx?.rows?.length) return []
   return [clavoElUltimo(ctx), enRacha(ctx), escalador(ctx), francotirador(ctx)].filter(Boolean)
 }
