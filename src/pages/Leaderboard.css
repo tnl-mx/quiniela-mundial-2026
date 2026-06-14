@@ -101,6 +101,44 @@
   }
 }
 
+/* Tarjeta rotativa "Dato del momento": mismo look + cursor, altura reservada
+   para no brincar entre stats de distinto largo, y puntitos indicadores. */
+.lb-stat--rot {
+  cursor: pointer;
+  position: relative;
+  min-height: 5.25rem;
+  justify-content: center;
+}
+.lb-stat--rot:hover {
+  border-color: var(--color-accent);
+}
+.lb-stat__fade {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: lb-stat-fade 0.35s ease;
+}
+@keyframes lb-stat-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.lb-stat__dots {
+  position: absolute;
+  bottom: 6px;
+  right: 10px;
+  display: flex;
+  gap: 4px;
+}
+.lb-stat__dots i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-border-strong);
+}
+.lb-stat__dots i.is-on {
+  background: var(--color-accent);
+}
+
 /* ---------- Contenedor de la tabla ----------
    overflow visible (no hidden) para que los popovers de los encabezados no se
    recorten; las esquinas redondeadas se logran en la cabecera y la ultima fila. */

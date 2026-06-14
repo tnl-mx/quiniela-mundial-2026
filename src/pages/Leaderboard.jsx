@@ -12,12 +12,13 @@
 // navegacion por estado interno (sin ruteo de URL todavia).
 // ============================================================================
 
-import { useState, useLayoutEffect } from 'react'
+import { useState, useLayoutEffect, useEffect, useMemo } from 'react'
 import './Leaderboard.css'
 import { useLeaderboard } from '../data/useLeaderboard.js'
 import { PersonDetail } from './PersonDetail.jsx'
 import { EvolutionChart } from './EvolutionChart.jsx'
 import { readScroll, saveScroll } from '../data/scrollMemory.js'
+import { buildQuirkStats } from '../logic/quirkStats.js'
 
 // Indicador de subio/bajo respecto a hace 4 partidos.
 function DeltaIndicator({ delta }) {
@@ -117,6 +118,51 @@ function StatCard({ tag, name, detail }) {
       <span className="lb-stat__tag">{tag}</span>
       <span className="lb-stat__name">{name}</span>
       <span className="lb-stat__detail">{detail}</span>
+    </div>
+  )
+}
+
+// Tarjeta "Dato del momento": cicla entre varias stats. Rota sola cada 8s y
+// avanza al tocarla. Reusa el look de .lb-stat; reserva altura para no brincar.
+function RotatingStatCard({ stats }) {
+  const [i, setI] = useState(0)
+  useEffect(() => {
+    if (stats.length <= 1) return
+    const t = setInterval(() => setI((p) => (p + 1) % stats.length), 8000)
+    return () => clearInterval(t)
+  }, [stats.length])
+
+  if (stats.length === 0) return null
+  const idx = i % stats.length
+  const s = stats[idx]
+  const next = () => setI((p) => (p + 1) % stats.length)
+
+  return (
+    <div
+      className="lb-stat lb-stat--rot"
+      role="button"
+      tabIndex={0}
+      onClick={next}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          next()
+        }
+      }}
+      title="Toca para ver otro dato"
+    >
+      <div className="lb-stat__fade" key={idx}>
+        <span className="lb-stat__tag">{s.emoji} {s.titulo}</span>
+        <span className="lb-stat__name">{s.headline}</span>
+        <span className="lb-stat__detail">{s.detalle}</span>
+      </div>
+      {stats.length > 1 && (
+        <span className="lb-stat__dots" aria-hidden="true">
+          {stats.map((_, k) => (
+            <i key={k} className={k === idx ? 'is-on' : ''} />
+          ))}
+        </span>
+      )}
     </div>
   )
 }
@@ -231,6 +277,13 @@ export function Leaderboard({ tournamentId }) {
     setSelectedFile(r.file)
   }
 
+  // Stats rotativas "Dato del momento" (memoizadas: solo recalcula al cambiar
+  // resultados o quinielas; escalador reconstruye rankings con el motor).
+  const quirks = useMemo(
+    () => buildQuirkStats({ rows, realResults, tournament, teams, annexCOptions, scoring }),
+    [rows, realResults, tournament, teams, annexCOptions, scoring],
+  )
+
   if (selectedFile && selectedIndex !== -1) {
     return (
       <PersonDetail
@@ -295,23 +348,46 @@ export function Leaderboard({ tournamentId }) {
       {!loading && !error && !notFound && rows.length > 0 && (
         <>
           {/* Tarjetas de stats: solo las que aplican a la fase actual */}
-          {phase !== 'pre' && (
-            <section className="lb-stats">
-              <StatCard tag="🥇 Líder" name={rows[0].name} detail={`${rows[0].total} pts`} />
-              <StatCard
-                tag="🎯 Rey del marcador"
-                name={maxBy(rows, (r) => r.cols.partidos).name}
-                detail={`${maxBy(rows, (r) => r.cols.partidos).cols.partidos} pts en partidos`}
-              />
-              {phase === 'knockout' && (
+          {phase !== 'pre' && (() => {
+            // Lider con manejo de empate en el total mas alto.
+            const topTotal = rows[0].total
+            const leaders = rows.filter((r) => r.total === topTotal)
+            const tieLabel =
+              leaders.length === 2
+                ? 'Empate en la cima'
+                : leaders.length === 3
+                  ? 'Triple empate en la cima'
+                  : `Empate de ${leaders.length} en la cima`
+            const leaderNames =
+              leaders.length <= 3
+                ? leaders.map((r) => r.name).join(', ')
+                : leaders.slice(0, 3).map((r) => r.name).join(', ') + ` +${leaders.length - 3}`
+            return (
+              <section className="lb-stats">
                 <StatCard
-                  tag="🔼 Rey de la eliminatoria"
-                  name={maxBy(rows, knockoutPoints).name}
-                  detail={`${knockoutPoints(maxBy(rows, knockoutPoints))} pts de eliminatoria`}
+                  tag="🥇 Líder"
+                  name={leaders.length === 1 ? rows[0].name : tieLabel}
+                  detail={leaders.length === 1 ? `${topTotal} pts` : `${leaderNames} · ${topTotal} pts`}
                 />
-              )}
-            </section>
-          )}
+                {quirks.length > 0 ? (
+                  <RotatingStatCard stats={quirks} />
+                ) : (
+                  <StatCard
+                    tag="🎯 Rey del marcador"
+                    name={maxBy(rows, (r) => r.cols.partidos).name}
+                    detail={`${maxBy(rows, (r) => r.cols.partidos).cols.partidos} pts en partidos`}
+                  />
+                )}
+                {phase === 'knockout' && (
+                  <StatCard
+                    tag="🔼 Rey de la eliminatoria"
+                    name={maxBy(rows, knockoutPoints).name}
+                    detail={`${knockoutPoints(maxBy(rows, knockoutPoints))} pts de eliminatoria`}
+                  />
+                )}
+              </section>
+            )
+          })()}
 
           {/* Banner cuando hay gente pero el torneo no ha empezado (todos en 0) */}
           {phase === 'pre' && (
