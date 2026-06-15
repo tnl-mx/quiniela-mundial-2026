@@ -5,7 +5,12 @@
 // reconstruir rankings en un punto del torneo reusan la MISMA logica que la
 // grafica de evolucion: cropRealResults + scorePrediction + ordenar.
 
-import { maxPlayedMatch, matchNumber, CHRONO_IDS, cropRealResults } from './matchOrder.js'
+import {
+  maxPlayedMatch,
+  matchNumber,
+  cropRealResults,
+  latestPlayedMatchId,
+} from './matchOrder.js'
 import { scorePrediction } from './scoring.js'
 
 function isValidScore(s) {
@@ -51,12 +56,13 @@ function positionsAt(n, { rows, realResults, tournament, teams, annexCOptions, s
   return pos
 }
 
-// a) Quienes clavaron el marcador EXACTO del ultimo partido (mayor numero de
-//    match jugado). Igualdad directa de hs y as.
+// a) Quienes clavaron el marcador EXACTO del ULTIMO partido capturado (el que se
+//    acaba de subir, por orden de captura, NO el de mayor numero de calendario).
+//    Igualdad directa de hs y as. Si nadie lo clavo, igual mostramos el partido
+//    con "Nadie lo clavó".
 export function clavoElUltimo({ rows, realResults, tournament, teams }) {
-  const n = maxPlayedMatch(realResults)
-  if (n === 0) return null
-  const id = CHRONO_IDS[n - 1]
+  const id = latestPlayedMatchId(realResults)
+  if (!id) return null
   const isKO = id.startsWith('M')
   const real = isKO ? realResults.knockout?.[id] : realResults.groupMatches?.[id]
   if (!isValidScore(real)) return null
