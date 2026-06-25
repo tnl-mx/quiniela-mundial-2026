@@ -18,6 +18,7 @@ import { useEffect, useMemo } from 'react'
 import './PersonDetail.css'
 import { resolveStandings, isGroupComplete } from '../logic/scoring.js'
 import { buildBracket } from '../logic/bracket.js'
+import { realR32Slots } from '../logic/realBracket.js'
 import { latestPlayedMatchId } from '../logic/matchOrder.js'
 import { readScroll, saveScroll } from '../data/scrollMemory.js'
 
@@ -146,6 +147,26 @@ function MatchRow({ teams, home, away, predText, predPens, realText, points, pla
   )
 }
 
+// Linea con el cruce REAL de una llave de la Ronda de 32: el equipo si ya se
+// sabe (grupo cerrado o posicion amarrada) o la sigla (1A/2B/3o) si falta.
+// `slot` = { home: {code,label,locked}, away: {code,label,locked} }.
+function RealSlotLine({ teams, slot }) {
+  const cell = (s) =>
+    s.code ? (
+      <strong className="pd-realko__team">
+        {teams[s.code]?.flag ?? '🏳'} {s.code}
+      </strong>
+    ) : (
+      <span className="pd-realko__slot">{s.label}</span>
+    )
+  return (
+    <div className="pd-realko">
+      <span className="pd-realko__tag">Real</span>
+      {cell(slot.home)} <span className="pd-realko__vs">vs</span> {cell(slot.away)}
+    </div>
+  )
+}
+
 // ---------- Vista ----------
 
 export function PersonDetail({ row, position, tournament, teams, realResults, annexCOptions = [], demo = false, tournamentId, onBack }) {
@@ -182,6 +203,14 @@ export function PersonDetail({ row, position, tournament, teams, realResults, an
     if (ms.length) koByRound[label] = ms
   }
   const hasKnockout = Object.keys(koByRound).length > 0
+
+  // Cruces REALES de la Ronda de 32: equipo si ya se sabe (grupo cerrado o
+  // posicion amarrada matematicamente) o sigla (1A/2B/3o) si falta. Es igual
+  // para todos; se muestra junto a cada llave para comparar contra lo predicho.
+  const realSlots = useMemo(
+    () => realR32Slots({ realResults, tournament, teams, annexCOptions }),
+    [realResults, tournament, teams, annexCOptions],
+  )
 
   // ----- Posicionar el scroll al ABRIR la quiniela (una vez por persona) -----
   // Prioridad: 1) si hay memoria y NO entro un resultado nuevo desde entonces,
@@ -391,18 +420,22 @@ export function PersonDetail({ row, position, tournament, teams, realResults, an
                 const realText = mItem ? `${fmt(mItem.actual)}${realPens}` : null
 
                 return (
-                  <MatchRow
-                    key={m.id}
-                    teams={teams}
-                    home={m.home}
-                    away={m.away}
-                    predText={fmt(m) ?? '—'}
-                    predPens={predPens}
-                    realText={realText}
-                    points={koPoints(mItem, pItem, x2)}
-                    played={!!mItem}
-                    matchId={m.id}
-                  />
+                  <div className="pd-ko-item" key={m.id}>
+                    <MatchRow
+                      teams={teams}
+                      home={m.home}
+                      away={m.away}
+                      predText={fmt(m) ?? '—'}
+                      predPens={predPens}
+                      realText={realText}
+                      points={koPoints(mItem, pItem, x2)}
+                      played={!!mItem}
+                      matchId={m.id}
+                    />
+                    {r === 'Ronda de 32' && realSlots[m.id] && (
+                      <RealSlotLine teams={teams} slot={realSlots[m.id]} />
+                    )}
+                  </div>
                 )
               })}
             </div>
