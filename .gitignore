@@ -158,3 +158,8 @@ scripts/generar-demo.js
 
 # Archivos de pronosticos exportados para WhatsApp (locales, no se suben)
 *-pronosticos.txt
+
+# Reportes locales de analisis (no versionar)
+reporte-*.html
+
+src/logic/.tmp_*

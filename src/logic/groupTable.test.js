@@ -76,12 +76,14 @@ describe('calculateGroupTable', () => {
     })
   })
 
-  it('b) separa por diferencia de goles cuando dos equipos empatan en puntos', () => {
-    // MEX y KOR terminan con 6 pts cada uno, pero KOR con mejor GD.
+  it('b) FIFA 2026: el ENFRENTAMIENTO DIRECTO manda aunque tenga peor diferencia general', () => {
+    // MEX y KOR terminan con 6 pts cada uno. KOR tiene MEJOR diferencia general
+    // (+3 vs +1), pero MEX le gano a KOR en el partido directo (A3 2-1).
+    // FIFA 2026: el head-to-head va primero -> MEX 1o, KOR 2o.
     const predictions = {
       A1: { hs: 1, as: 0 }, // MEX 1-0 RSA  (MEX W)
       A2: { hs: 3, as: 1 }, // KOR 3-1 CZE  (KOR W)
-      A3: { hs: 2, as: 1 }, // MEX 2-1 KOR  (MEX W)
+      A3: { hs: 2, as: 1 }, // MEX 2-1 KOR  (MEX gana el directo)
       A4: { hs: 1, as: 1 }, // CZE 1-1 RSA  (empate)
       A5: { hs: 2, as: 1 }, // CZE 2-1 MEX  (MEX L)
       A6: { hs: 0, as: 2 }, // RSA 0-2 KOR  (KOR W)
@@ -94,37 +96,37 @@ describe('calculateGroupTable', () => {
       teams,
     })
 
-    // KOR: GF 6, GC 3, GD +3, 6 pts
-    // MEX: GF 4, GC 3, GD +1, 6 pts
+    // MEX 1o por head-to-head, pese a peor diferencia general.
     expect(table[0]).toMatchObject({
-      code: 'KOR',
-      position: 1,
-      points: 6,
-      goalDifference: 3,
-      tied: false,
-      tiedWith: [],
-    })
-    expect(table[1]).toMatchObject({
       code: 'MEX',
-      position: 2,
+      position: 1,
       points: 6,
       goalDifference: 1,
       tied: false,
       tiedWith: [],
     })
+    // KOR 2o (mejor diferencia general, pero perdio el directo).
+    expect(table[1]).toMatchObject({
+      code: 'KOR',
+      position: 2,
+      points: 6,
+      goalDifference: 3,
+      tied: false,
+      tiedWith: [],
+    })
   })
 
-  it('c) marca empate no resuelto cuando puntos, GD y GF coinciden exactamente, y los ordena provisionalmente por ranking FIFA', () => {
-    // MEX y KOR quedan EXACTAMENTE iguales: 6 pts, GD +1, GF 2.
-    // FIFA: MEX 15 vs KOR 22 -> MEX debe ir primero pero AMBOS quedan
-    // marcados como empate no resuelto.
+  it('c) marca empate no resuelto solo cuando ni head-to-head ni lo general separan, y ordena por ranking FIFA', () => {
+    // MEX y KOR quedan iguales: 7 pts, GD +4, GF 5, y EMPATARON su partido
+    // directo (A3 1-1) -> el head-to-head tampoco separa. Empate real: se
+    // marcan tied y se ordenan por ranking FIFA (MEX 15 < KOR 22).
     const predictions = {
-      A1: { hs: 1, as: 0 }, // MEX 1-0 RSA  (MEX W)
-      A2: { hs: 1, as: 0 }, // KOR 1-0 CZE  (KOR W)
-      A3: { hs: 0, as: 1 }, // MEX 0-1 KOR  (KOR W)
-      A4: { hs: 1, as: 1 }, // CZE 1-1 RSA  (empate)
-      A5: { hs: 0, as: 1 }, // CZE 0-1 MEX  (MEX W de visita)
-      A6: { hs: 1, as: 0 }, // RSA 1-0 KOR  (KOR L)
+      A1: { hs: 2, as: 0 }, // MEX 2-0 RSA  (MEX W)
+      A2: { hs: 2, as: 0 }, // KOR 2-0 CZE  (KOR W)
+      A3: { hs: 1, as: 1 }, // MEX 1-1 KOR  (directo EMPATADO)
+      A4: { hs: 1, as: 0 }, // CZE 1-0 RSA  (CZE W)
+      A5: { hs: 0, as: 2 }, // CZE 0-2 MEX  (MEX W de visita)
+      A6: { hs: 0, as: 2 }, // RSA 0-2 KOR  (KOR W de visita)
     }
 
     const table = calculateGroupTable({
@@ -134,35 +136,96 @@ describe('calculateGroupTable', () => {
       teams,
     })
 
-    // Primer lugar: MEX, marcado como empatado con KOR.
+    // MEX y KOR: ambos 7 pts, GD +4, GF 5; directo empatado -> empate real.
     expect(table[0]).toMatchObject({
       code: 'MEX',
       position: 1,
-      points: 6,
-      goalDifference: 1,
-      goalsFor: 2,
+      points: 7,
+      goalDifference: 4,
+      goalsFor: 5,
       tied: true,
       tiedWith: ['KOR'],
     })
-    // Segundo lugar: KOR, marcado como empatado con MEX.
     expect(table[1]).toMatchObject({
       code: 'KOR',
       position: 2,
-      points: 6,
-      goalDifference: 1,
-      goalsFor: 2,
+      points: 7,
+      goalDifference: 4,
+      goalsFor: 5,
       tied: true,
       tiedWith: ['MEX'],
     })
 
-    // Los otros dos NO estan en el mismo empate (puntos/GD/GF distintos).
+    // Los otros dos NO estan en ese empate.
     expect(table[2].tied).toBe(false)
     expect(table[3].tied).toBe(false)
 
-    // Sanity: verificamos que el orden provisional respeta el ranking FIFA
-    // (MEX=15 antes que KOR=22) y NO al reves.
-    const firstTwo = table.slice(0, 2).map((r) => r.code)
-    expect(firstTwo).toEqual(['MEX', 'KOR'])
+    // Orden provisional por ranking FIFA: MEX=15 antes que KOR=22.
+    expect(table.slice(0, 2).map((r) => r.code)).toEqual(['MEX', 'KOR'])
+  })
+
+  it('e) triple empate: se resuelve por GOLES del head-to-head y se re-aplica al subconjunto', () => {
+    // MEX, KOR y CZE terminan con 5 pts y empataron sus 3 partidos entre si,
+    // con distintos goles en esos enfrentamientos directos:
+    //   directos: MEX 0-0 KOR, KOR 2-2 CZE, CZE 1-1 MEX
+    //   goles head-to-head: CZE 3, KOR 2, MEX 1  -> CZE > KOR > MEX
+    // Aunque MEX tiene mejor diferencia GENERAL (golea a RSA), el head-to-head
+    // manda: CZE 1o, KOR 2o, MEX 3o.
+    const predictions = {
+      A1: { hs: 5, as: 0 }, // MEX 5-0 RSA  (MEX golea: mejor GD general)
+      A2: { hs: 2, as: 2 }, // KOR 2-2 CZE  (directo)
+      A3: { hs: 0, as: 0 }, // MEX 0-0 KOR  (directo)
+      A4: { hs: 1, as: 0 }, // CZE 1-0 RSA  (CZE W)
+      A5: { hs: 1, as: 1 }, // CZE 1-1 MEX  (directo)
+      A6: { hs: 0, as: 1 }, // RSA 0-1 KOR  (KOR W)
+    }
+
+    const table = calculateGroupTable({
+      groupCode: 'A',
+      predictions,
+      tournament,
+      teams,
+    })
+
+    expect(table.map((r) => r.code)).toEqual(['CZE', 'KOR', 'MEX', 'RSA'])
+    // Todos quedaron resueltos por head-to-head: nadie marcado como empate.
+    expect(table.every((r) => r.tied === false)).toBe(true)
+    expect(table[2]).toMatchObject({ code: 'MEX', position: 3, points: 5 })
+  })
+
+  it('f) si el head-to-head no separa (empate directo), cae a la diferencia general', () => {
+    // MEX y KOR con 5 pts; empataron su directo (A3 1-1) pero MEX tiene mejor
+    // diferencia general (+3 vs +1). Se resuelve por lo general, sin marcar empate.
+    const predictions = {
+      A1: { hs: 3, as: 0 }, // MEX 3-0 RSA  (MEX W)
+      A2: { hs: 1, as: 0 }, // KOR 1-0 CZE  (KOR W)
+      A3: { hs: 1, as: 1 }, // MEX 1-1 KOR  (directo EMPATADO)
+      A4: { hs: 2, as: 2 }, // CZE 2-2 RSA  (empate)
+      A5: { hs: 1, as: 1 }, // CZE 1-1 MEX  (empate)
+      A6: { hs: 1, as: 1 }, // RSA 1-1 KOR  (empate)
+    }
+
+    const table = calculateGroupTable({
+      groupCode: 'A',
+      predictions,
+      tournament,
+      teams,
+    })
+
+    expect(table[0]).toMatchObject({
+      code: 'MEX',
+      position: 1,
+      points: 5,
+      goalDifference: 3,
+      tied: false,
+    })
+    expect(table[1]).toMatchObject({
+      code: 'KOR',
+      position: 2,
+      points: 5,
+      goalDifference: 1,
+      tied: false,
+    })
   })
 
   it('d) maneja marcadores incompletos sin truenar', () => {
