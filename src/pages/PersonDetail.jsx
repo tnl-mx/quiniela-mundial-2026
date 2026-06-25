@@ -292,7 +292,16 @@ export function PersonDetail({ row, position, tournament, teams, realResults, an
 
           return (
             <div className="pd-block" key={g}>
-              <h3 className="pd-block__title">Grupo {g}</h3>
+              <h3 className="pd-block__title">
+                Grupo {g}
+                {complete ? (
+                  <span className="pd-gstatus pd-gstatus--closed">✓ Cerrado</span>
+                ) : (
+                  <span className="pd-gstatus pd-gstatus--open">
+                    Por definir · {playedInGroup}/{matches.length}
+                  </span>
+                )}
+              </h3>
 
               {matches.map((m) => {
                 const item = gm[m.id]
@@ -318,7 +327,7 @@ export function PersonDetail({ row, position, tournament, teams, realResults, an
                   (✓ y color) solo se marca cuando el grupo ya termino: antes no
                   hay con que comparar. */}
               {predSt && (
-                <div className="pd-standings">
+                <div className={`pd-standings ${complete ? 'pd-standings--closed' : 'pd-standings--open'}`}>
                   <div className="pd-standings__row pd-standings__row--head">
                     <span>#</span>
                     <span>Predicho</span>

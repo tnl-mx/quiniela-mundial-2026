@@ -178,6 +178,9 @@
 }
 
 .pd-block__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   margin: 0;
   padding: var(--space-2) var(--space-4);
   font-size: 0.8rem;
@@ -187,6 +190,23 @@
   color: var(--color-text-muted);
   background: var(--color-bg);
   border-bottom: 1px solid var(--color-border);
+}
+
+/* Estado del grupo: cerrado (verde) vs por definir (ambar). */
+.pd-gstatus {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+.pd-gstatus--closed {
+  background: var(--color-brand-tint);
+  color: var(--color-brand-dark);
+}
+.pd-gstatus--open {
+  background: #FDEFD0;
+  color: #92600A;
 }
 
 /* ---------- Fila de partido (REJILLA consistente) ----------
@@ -431,6 +451,21 @@
   background: var(--color-bg);
   border-top: 1px dashed var(--color-border);
   font-size: 0.8rem;
+}
+
+/* Grupo CERRADO: tabla definitiva, acento verde solido a la izquierda. */
+.pd-standings--closed {
+  border-left: 3px solid var(--color-brand);
+  background: var(--color-brand-tint);
+}
+/* Grupo POR DEFINIR: tabla provisional, acento ambar punteado. */
+.pd-standings--open {
+  border-left: 3px dashed var(--color-warning);
+}
+/* En grupos por definir, la columna "Actual" se ve provisional. */
+.pd-standings--open .pd-standings__row > span:last-child {
+  font-style: italic;
+  color: var(--color-text-muted);
 }
 
 .pd-standings__row {
