@@ -464,40 +464,41 @@
   opacity: 0.7;
 }
 
-/* ---------- Cruce real de la Ronda de 32 (equipo o sigla 1A/2B/3o) ---------- */
-.pd-ko-item {
-  margin-bottom: var(--space-2);
+/* ---------- Llave real de la Ronda de 32 (equipo o sigla 1A/2B/3o) ---------- */
+.pd-realbracket {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
 }
-.pd-realko {
+@media (min-width: 560px) {
+  .pd-realbracket {
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--space-4);
+  }
+}
+.pd-rb__row {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 3px 8px 5px;
-  font-size: 0.78rem;
-  color: var(--color-text-muted);
+  gap: 8px;
+  padding: 5px 10px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
 }
-.pd-realko__tag {
-  font-size: 0.62rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 1px 6px;
-  border-radius: var(--radius-pill);
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
-}
-.pd-realko__team {
+.pd-rb__team {
   color: var(--color-text);
 }
-.pd-realko__slot {
+.pd-rb__slot {
   font-weight: 700;
   color: var(--color-text-muted);
   border: 1px dashed var(--color-border);
   border-radius: var(--radius-sm);
-  padding: 0 5px;
+  padding: 0 6px;
 }
-.pd-realko__vs {
-  opacity: 0.6;
+.pd-rb__vs {
+  opacity: 0.55;
+  font-size: 0.75rem;
 }
 
 /* ---------- Banderita de demo ---------- */

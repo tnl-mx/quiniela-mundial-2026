@@ -147,22 +147,31 @@ function MatchRow({ teams, home, away, predText, predPens, realText, points, pla
   )
 }
 
-// Linea con el cruce REAL de una llave de la Ronda de 32: el equipo si ya se
-// sabe (grupo cerrado o posicion amarrada) o la sigla (1A/2B/3o) si falta.
-// `slot` = { home: {code,label,locked}, away: {code,label,locked} }.
-function RealSlotLine({ teams, slot }) {
+// Cuadro REAL de la Ronda de 32 (oficial): cada llave con su equipo si ya se
+// sabe (grupo cerrado o posicion AMARRADA matematicamente) o su sigla
+// (1A/2B/3o) si todavia no. Es el mismo para todos; va como REFERENCIA, sin
+// mezclarse con lo que predijo la persona (el motor puntua por equipo, no por
+// posicion del cuadro). `slots` = { matchId: { home, away } } de realR32Slots.
+function RealBracketR32({ teams, slots }) {
+  const ids = Object.keys(slots)
+  if (ids.length === 0) return null
   const cell = (s) =>
     s.code ? (
-      <strong className="pd-realko__team">
+      <strong className="pd-rb__team">
         {teams[s.code]?.flag ?? '🏳'} {s.code}
       </strong>
     ) : (
-      <span className="pd-realko__slot">{s.label}</span>
+      <span className="pd-rb__slot">{s.label}</span>
     )
   return (
-    <div className="pd-realko">
-      <span className="pd-realko__tag">Real</span>
-      {cell(slot.home)} <span className="pd-realko__vs">vs</span> {cell(slot.away)}
+    <div className="pd-realbracket">
+      {ids.map((id) => (
+        <div className="pd-rb__row" key={id}>
+          {cell(slots[id].home)}
+          <span className="pd-rb__vs">vs</span>
+          {cell(slots[id].away)}
+        </div>
+      ))}
     </div>
   )
 }
@@ -386,9 +395,22 @@ export function PersonDetail({ row, position, tournament, teams, realResults, an
         })}
       </section>
 
+      {/* ===== LLAVE REAL (Ronda de 32) ===== */}
+      <section className="pd-section">
+        <h2 className="pd-section__title">Llave real · Ronda de 32</h2>
+        <p className="pd-muted">
+          El cuadro oficial, igual para todos: el equipo si su lugar ya está
+          definido o asegurado matemáticamente (p. ej. México 1A), o la sigla
+          (1A, 2B, 3º) si todavía falta. Es solo referencia; no se compara llave
+          por llave con tu bracket porque el motor puntúa por equipo, no por
+          posición del cuadro.
+        </p>
+        <RealBracketR32 teams={teams} slots={realSlots} />
+      </section>
+
       {/* ===== FASE ELIMINATORIA ===== */}
       <section className="pd-section">
-        <h2 className="pd-section__title">Fase eliminatoria</h2>
+        <h2 className="pd-section__title">Tu eliminatoria</h2>
         {!hasKnockout ? (
           <p className="pd-muted">
             Sin pronóstico de eliminatoria todavía (o la fase aún no comienza).
@@ -420,22 +442,18 @@ export function PersonDetail({ row, position, tournament, teams, realResults, an
                 const realText = mItem ? `${fmt(mItem.actual)}${realPens}` : null
 
                 return (
-                  <div className="pd-ko-item" key={m.id}>
-                    <MatchRow
-                      teams={teams}
-                      home={m.home}
-                      away={m.away}
-                      predText={fmt(m) ?? '—'}
-                      predPens={predPens}
-                      realText={realText}
-                      points={koPoints(mItem, pItem, x2)}
-                      played={!!mItem}
-                      matchId={m.id}
-                    />
-                    {r === 'Ronda de 32' && realSlots[m.id] && (
-                      <RealSlotLine teams={teams} slot={realSlots[m.id]} />
-                    )}
-                  </div>
+                  <MatchRow
+                    key={m.id}
+                    teams={teams}
+                    home={m.home}
+                    away={m.away}
+                    predText={fmt(m) ?? '—'}
+                    predPens={predPens}
+                    realText={realText}
+                    points={koPoints(mItem, pItem, x2)}
+                    played={!!mItem}
+                    matchId={m.id}
+                  />
                 )
               })}
             </div>
