@@ -275,8 +275,14 @@ export function PersonDetail({ row, position, tournament, teams, realResults, de
         {GROUP_LETTERS.filter((g) => tournament.groups[g]).map((g) => {
           const matches = tournament.groupMatches.filter((m) => m.group === g)
           const complete = isGroupComplete(realResults, g, tournament)
-          const predSt = complete ? resolveStandings(pred, g, tournament, teams) : null
-          const realSt = complete ? resolveStandings(realResults, g, tournament, teams) : null
+          const playedInGroup = matches.filter((m) => gm[m.id]).length
+          // Posiciones que PREDIJO la persona: su quiniela es fija, asi que se
+          // muestran SIEMPRE (aunque el grupo todavia no cierre).
+          const predSt = resolveStandings(pred, g, tournament, teams)
+          // Tabla REAL: posicion ACTUAL segun lo ya jugado (o final, si cerro).
+          // Sin partidos jugados aun no hay nada que mostrar.
+          const realSt =
+            playedInGroup > 0 ? resolveStandings(realResults, g, tournament, teams) : null
 
           return (
             <div className="pd-block" key={g}>
@@ -300,25 +306,40 @@ export function PersonDetail({ row, position, tournament, teams, realResults, de
                 )
               })}
 
-              {/* Tabla del grupo: posiciones predichas vs reales (si ya termino) */}
-              {complete && (
+              {/* Tabla del grupo: a la izquierda lo que PREDIJO la persona (su
+                  orden final), a la derecha la posicion ACTUAL segun lo ya
+                  jugado (o el orden FINAL cuando el grupo cierra). El acierto
+                  (✓ y color) solo se marca cuando el grupo ya termino: antes no
+                  hay con que comparar. */}
+              {predSt && (
                 <div className="pd-standings">
                   <div className="pd-standings__row pd-standings__row--head">
                     <span>#</span>
                     <span>Predicho</span>
-                    <span>Real</span>
+                    <span>{complete ? 'Final' : 'Actual'}</span>
                   </div>
                   {[0, 1, 2, 3].map((i) => {
-                    const ok = predSt[i] && predSt[i] === realSt[i]
+                    const ok = complete && predSt[i] && predSt[i] === realSt[i]
+                    const cellClass = !complete
+                      ? ''
+                      : ok
+                        ? 'pd-standings__cell--ok'
+                        : 'pd-standings__cell--bad'
                     return (
                       <div className="pd-standings__row" key={i}>
                         <span>{i + 1}</span>
-                        <span className={ok ? 'pd-standings__cell--ok' : 'pd-standings__cell--bad'}>
+                        <span className={cellClass}>
                           {teams[predSt[i]]?.flag ?? ''} {predSt[i]}
                           {ok ? ' ✓' : ''}
                         </span>
                         <span>
-                          {teams[realSt[i]]?.flag ?? ''} {realSt[i]}
+                          {realSt ? (
+                            <>
+                              {teams[realSt[i]]?.flag ?? ''} {realSt[i]}
+                            </>
+                          ) : (
+                            <span className="pd-standings__pending">—</span>
+                          )}
                         </span>
                       </div>
                     )
