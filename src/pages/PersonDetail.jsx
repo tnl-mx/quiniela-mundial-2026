@@ -14,26 +14,26 @@
 // Vista PUBLICA: cualquiera puede ver la quiniela de cualquiera.
 // ============================================================================
 
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import './PersonDetail.css'
 import { resolveStandings, isGroupComplete } from '../logic/scoring.js'
+import { buildBracket } from '../logic/bracket.js'
 import { latestPlayedMatchId } from '../logic/matchOrder.js'
 import { readScroll, saveScroll } from '../data/scrollMemory.js'
 
 const GROUP_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
 
-// Rango de match numbers -> nombre de ronda (cuadro oficial FIFA).
-function roundOf(matchId) {
-  const n = Number.parseInt(matchId.slice(1), 10)
-  if (n >= 73 && n <= 88) return 'Ronda de 32'
-  if (n >= 89 && n <= 96) return 'Octavos'
-  if (n >= 97 && n <= 100) return 'Cuartos'
-  if (n >= 101 && n <= 102) return 'Semifinales'
-  if (n === 103) return 'Tercer lugar'
-  if (n === 104) return 'Final'
-  return 'Eliminatoria'
-}
-const ROUND_ORDER = ['Ronda de 32', 'Octavos', 'Cuartos', 'Semifinales', 'Tercer lugar', 'Final']
+// Rondas del bracket (clave que devuelve buildBracket -> etiqueta visible),
+// en orden de avance.
+const KO_ROUNDS = [
+  ['r32', 'Ronda de 32'],
+  ['r16', 'Octavos'],
+  ['qf', 'Cuartos'],
+  ['sf', 'Semifinales'],
+  ['third', 'Tercer lugar'],
+  ['final', 'Final'],
+]
+const ROUND_ORDER = KO_ROUNDS.map(([, label]) => label)
 
 function initials(name) {
   return name.split(' ').map((w) => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase()
@@ -148,7 +148,7 @@ function MatchRow({ teams, home, away, predText, predPens, realText, points, pla
 
 // ---------- Vista ----------
 
-export function PersonDetail({ row, position, tournament, teams, realResults, demo = false, tournamentId, onBack }) {
+export function PersonDetail({ row, position, tournament, teams, realResults, annexCOptions = [], demo = false, tournamentId, onBack }) {
   // Mapas de items por categoria para buscar rapido.
   const items = row.items ?? []
   const gm = {} // groupMatches por matchId
@@ -167,15 +167,21 @@ export function PersonDetail({ row, position, tournament, teams, realResults, de
   const pred = row.prediction ?? {}
   const fmt = (s) => (s && Number.isFinite(s.hs) && Number.isFinite(s.as) ? `${s.hs}–${s.as}` : null)
 
-  // ----- Fase eliminatoria: llaves que predijo la persona, por ronda -----
-  const koPred = pred.knockout ?? {}
-  const koIds = Object.keys(koPred).filter((id) => koPred[id]?.home && koPred[id]?.away)
+  // ----- Fase eliminatoria: bracket DERIVADO de la tabla de grupo de la
+  // persona (igual que el motor de puntuacion), para que vea su bracket ya
+  // RECALCULADO segun el desempate FIFA 2026 y no el que se guardo al llenar la
+  // quiniela. Se respeta el marcador que predijo en cada llave; el equipo de
+  // cada slot se deriva del grupo (1o/2o/3o), igual que como se le puntua.
+  const predBracket = useMemo(
+    () => buildBracket({ tournament, teams, annexCOptions, predictions: pred }),
+    [tournament, teams, annexCOptions, pred],
+  )
   const koByRound = {}
-  for (const id of koIds) {
-    const r = roundOf(id)
-    ;(koByRound[r] ??= []).push(id)
+  for (const [key, label] of KO_ROUNDS) {
+    const ms = (predBracket[key] ?? []).filter((m) => m.home && m.away)
+    if (ms.length) koByRound[label] = ms
   }
-  const hasKnockout = koIds.length > 0
+  const hasKnockout = Object.keys(koByRound).length > 0
 
   // ----- Posicionar el scroll al ABRIR la quiniela (una vez por persona) -----
   // Prioridad: 1) si hay memoria y NO entro un resultado nuevo desde entonces,
@@ -362,15 +368,14 @@ export function PersonDetail({ row, position, tournament, teams, realResults, de
           ROUND_ORDER.filter((r) => koByRound[r]).map((r) => (
             <div className="pd-block" key={r}>
               <h3 className="pd-block__title">{r}</h3>
-              {koByRound[r].map((id) => {
-                const ko = koPred[id]
-                const mItem = koMatch[id]
-                const pItem = koPens[id]
-                const x2 = koX2[id]
+              {koByRound[r].map((m) => {
+                const mItem = koMatch[m.id]
+                const pItem = koPens[m.id]
+                const x2 = koX2[m.id]
 
                 // Penales que PREDIJO la persona (si capturo una llave empatada
                 // con pens). "x-y" sin prefijo (MatchRow le antepone "PEN ").
-                const pp = ko.pens
+                const pp = m.pens
                 const predPens =
                   pp?.went && Number.isFinite(pp.hs) && Number.isFinite(pp.as)
                     ? `${pp.hs}-${pp.as}`
@@ -387,16 +392,16 @@ export function PersonDetail({ row, position, tournament, teams, realResults, de
 
                 return (
                   <MatchRow
-                    key={id}
+                    key={m.id}
                     teams={teams}
-                    home={ko.home}
-                    away={ko.away}
-                    predText={fmt(ko) ?? '—'}
+                    home={m.home}
+                    away={m.away}
+                    predText={fmt(m) ?? '—'}
                     predPens={predPens}
                     realText={realText}
                     points={koPoints(mItem, pItem, x2)}
                     played={!!mItem}
-                    matchId={id}
+                    matchId={m.id}
                   />
                 )
               })}

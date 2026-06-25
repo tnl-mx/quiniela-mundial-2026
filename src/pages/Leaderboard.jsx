@@ -294,6 +294,7 @@ export function Leaderboard({ tournamentId }) {
         tournament={tournament}
         teams={teams}
         realResults={realResults}
+        annexCOptions={annexCOptions}
         demo={demo}
         tournamentId={tournamentId}
         onBack={() => setSelectedFile(null)}
