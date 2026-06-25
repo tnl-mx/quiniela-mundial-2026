@@ -18,7 +18,6 @@ import { useEffect, useMemo } from 'react'
 import './PersonDetail.css'
 import { resolveStandings, isGroupComplete } from '../logic/scoring.js'
 import { buildBracket } from '../logic/bracket.js'
-import { realR32Slots } from '../logic/realBracket.js'
 import { latestPlayedMatchId } from '../logic/matchOrder.js'
 import { readScroll, saveScroll } from '../data/scrollMemory.js'
 
@@ -147,35 +146,6 @@ function MatchRow({ teams, home, away, predText, predPens, realText, points, pla
   )
 }
 
-// Cuadro REAL de la Ronda de 32 (oficial): cada llave con su equipo si ya se
-// sabe (grupo cerrado o posicion AMARRADA matematicamente) o su sigla
-// (1A/2B/3o) si todavia no. Es el mismo para todos; va como REFERENCIA, sin
-// mezclarse con lo que predijo la persona (el motor puntua por equipo, no por
-// posicion del cuadro). `slots` = { matchId: { home, away } } de realR32Slots.
-function RealBracketR32({ teams, slots }) {
-  const ids = Object.keys(slots)
-  if (ids.length === 0) return null
-  const cell = (s) =>
-    s.code ? (
-      <strong className="pd-rb__team">
-        {teams[s.code]?.flag ?? '🏳'} {s.code}
-      </strong>
-    ) : (
-      <span className="pd-rb__slot">{s.label}</span>
-    )
-  return (
-    <div className="pd-realbracket">
-      {ids.map((id) => (
-        <div className="pd-rb__row" key={id}>
-          {cell(slots[id].home)}
-          <span className="pd-rb__vs">vs</span>
-          {cell(slots[id].away)}
-        </div>
-      ))}
-    </div>
-  )
-}
-
 // ---------- Vista ----------
 
 export function PersonDetail({ row, position, tournament, teams, realResults, annexCOptions = [], demo = false, tournamentId, onBack }) {
@@ -212,14 +182,6 @@ export function PersonDetail({ row, position, tournament, teams, realResults, an
     if (ms.length) koByRound[label] = ms
   }
   const hasKnockout = Object.keys(koByRound).length > 0
-
-  // Cruces REALES de la Ronda de 32: equipo si ya se sabe (grupo cerrado o
-  // posicion amarrada matematicamente) o sigla (1A/2B/3o) si falta. Es igual
-  // para todos; se muestra junto a cada llave para comparar contra lo predicho.
-  const realSlots = useMemo(
-    () => realR32Slots({ realResults, tournament, teams, annexCOptions }),
-    [realResults, tournament, teams, annexCOptions],
-  )
 
   // ----- Posicionar el scroll al ABRIR la quiniela (una vez por persona) -----
   // Prioridad: 1) si hay memoria y NO entro un resultado nuevo desde entonces,
@@ -395,22 +357,9 @@ export function PersonDetail({ row, position, tournament, teams, realResults, an
         })}
       </section>
 
-      {/* ===== LLAVE REAL (Ronda de 32) ===== */}
-      <section className="pd-section">
-        <h2 className="pd-section__title">Llave real · Ronda de 32</h2>
-        <p className="pd-muted">
-          El cuadro oficial, igual para todos: el equipo si su lugar ya está
-          definido o asegurado matemáticamente (p. ej. México 1A), o la sigla
-          (1A, 2B, 3º) si todavía falta. Es solo referencia; no se compara llave
-          por llave con tu bracket porque el motor puntúa por equipo, no por
-          posición del cuadro.
-        </p>
-        <RealBracketR32 teams={teams} slots={realSlots} />
-      </section>
-
       {/* ===== FASE ELIMINATORIA ===== */}
       <section className="pd-section">
-        <h2 className="pd-section__title">Tu eliminatoria</h2>
+        <h2 className="pd-section__title">Fase eliminatoria</h2>
         {!hasKnockout ? (
           <p className="pd-muted">
             Sin pronóstico de eliminatoria todavía (o la fase aún no comienza).

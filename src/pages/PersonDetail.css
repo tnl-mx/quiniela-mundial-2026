@@ -464,43 +464,6 @@
   opacity: 0.7;
 }
 
-/* ---------- Llave real de la Ronda de 32 (equipo o sigla 1A/2B/3o) ---------- */
-.pd-realbracket {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 4px;
-}
-@media (min-width: 560px) {
-  .pd-realbracket {
-    grid-template-columns: 1fr 1fr;
-    column-gap: var(--space-4);
-  }
-}
-.pd-rb__row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 10px;
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-size: 0.85rem;
-}
-.pd-rb__team {
-  color: var(--color-text);
-}
-.pd-rb__slot {
-  font-weight: 700;
-  color: var(--color-text-muted);
-  border: 1px dashed var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 0 6px;
-}
-.pd-rb__vs {
-  opacity: 0.55;
-  font-size: 0.75rem;
-}
-
 /* ---------- Banderita de demo ---------- */
 .pd-demo-flag {
   display: inline-block;
