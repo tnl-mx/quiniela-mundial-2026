@@ -289,7 +289,14 @@
       "as": 1
     }
   },
-  "knockout": {},
+  "knockout": {
+    "M73": {
+      "home": "RSA",
+      "away": "CAN",
+      "hs": 0,
+      "as": 1
+    }
+  },
   "champion": null,
   "awards": {}
 }
