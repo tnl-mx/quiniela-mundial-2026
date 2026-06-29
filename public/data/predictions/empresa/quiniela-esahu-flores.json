@@ -4,7 +4,7 @@
     "lastName": "Flores",
     "email": "proyectos@nemx.mx",
     "schemaVersion": 1,
-    "exportedAt": "2026-06-11T02:27:54.884Z",
+    "exportedAt": "2026-06-12T15:57:07.826Z",
     "tournament": "FIFA World Cup 2026"
   },
   "groupMatches": {
@@ -310,178 +310,98 @@
     "M73": {
       "home": "KOR",
       "away": "CAN",
-      "hs": 0,
-      "as": 0,
-      "pens": {
-        "went": true,
-        "hs": 2,
-        "as": 1
-      }
+      "hs": 2,
+      "as": 1
     },
     "M74": {
       "home": "GER",
       "away": "PAR",
-      "hs": 0,
-      "as": 0,
-      "pens": {
-        "went": true,
-        "hs": 3,
-        "as": 1
-      }
+      "hs": 3,
+      "as": 1
     },
     "M75": {
       "home": "NED",
       "away": "MAR",
-      "hs": 0,
-      "as": 0,
-      "pens": {
-        "went": true,
-        "hs": 1,
-        "as": 2
-      }
+      "hs": 1,
+      "as": 2
     },
     "M76": {
       "home": "BRA",
       "away": "JPN",
-      "hs": 0,
-      "as": 0,
-      "pens": {
-        "went": true,
-        "hs": 3,
-        "as": 1
-      }
+      "hs": 3,
+      "as": 0
     },
     "M77": {
       "home": "FRA",
       "away": "SWE",
-      "hs": 0,
-      "as": 0,
-      "pens": {
-        "went": true,
-        "hs": 2,
-        "as": 1
-      }
+      "hs": 2,
+      "as": 1
     },
     "M78": {
       "home": "CIV",
       "away": "NOR",
-      "hs": 0,
-      "as": 0,
-      "pens": {
-        "went": true,
-        "hs": 1,
-        "as": 2
-      }
+      "hs": 1,
+      "as": 2
     },
     "M79": {
       "home": "MEX",
       "away": "SCO",
-      "hs": 0,
-      "as": 0,
-      "pens": {
-        "went": true,
-        "hs": 2,
-        "as": 1
-      }
+      "hs": 2,
+      "as": 1
     },
     "M80": {
       "home": "ENG",
       "away": "COD",
-      "hs": 0,
-      "as": 0,
-      "pens": {
-        "went": true,
-        "hs": 2,
-        "as": 0
-      }
+      "hs": 2,
+      "as": 0
     },
     "M81": {
       "home": "TUR",
       "away": "BIH",
-      "hs": 0,
-      "as": 0,
-      "pens": {
-        "went": true,
-        "hs": 2,
-        "as": 0
-      }
+      "hs": 2,
+      "as": 0
     },
     "M82": {
       "home": "BEL",
       "away": "ECU",
-      "hs": 0,
-      "as": 0,
-      "pens": {
-        "went": true,
-        "hs": 2,
-        "as": 1
-      }
+      "hs": 2,
+      "as": 1
     },
     "M83": {
       "home": "COL",
       "away": "CRO",
-      "hs": 0,
-      "as": 0,
-      "pens": {
-        "went": true,
-        "hs": 2,
-        "as": 1
-      }
+      "hs": 2,
+      "as": 1
     },
     "M84": {
       "home": "ESP",
       "away": "ALG",
-      "hs": 0,
-      "as": 0,
-      "pens": {
-        "went": true,
-        "hs": 3,
-        "as": 1
-      }
+      "hs": 3,
+      "as": 1
     },
     "M85": {
       "home": "SUI",
       "away": "AUT",
-      "hs": 0,
-      "as": 0,
-      "pens": {
-        "went": true,
-        "hs": 1,
-        "as": 0
-      }
+      "hs": 1,
+      "as": 0
     },
     "M86": {
       "home": "ARG",
       "away": "URU",
-      "hs": 0,
-      "as": 0,
-      "pens": {
-        "went": true,
-        "hs": 2,
-        "as": 0
-      }
+      "hs": 2,
+      "as": 0
     },
     "M87": {
       "home": "POR",
       "away": "GHA",
-      "hs": 0,
-      "as": 0,
-      "pens": {
-        "went": true,
-        "hs": 2,
-        "as": 1
-      }
+      "hs": 2,
+      "as": 1
     },
     "M88": {
       "home": "USA",
       "away": "EGY",
-      "hs": 0,
-      "as": 0,
-      "pens": {
-        "went": true,
-        "hs": 1,
-        "as": 2
-      }
+      "hs": 1,
+      "as": 2
     },
     "M89": {
       "home": "GER",
