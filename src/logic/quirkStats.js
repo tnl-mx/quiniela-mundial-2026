@@ -78,12 +78,30 @@ export function clavoElUltimo({ rows, realResults, tournament, teams }) {
   }
   const flag = (c) => teams[c]?.flag ?? '🏳'
 
-  const clavaron = rows
-    .filter((r) => {
-      const p = isKO ? r.prediction?.knockout?.[id] : r.prediction?.groupMatches?.[id]
-      return p && p.hs === real.hs && p.as === real.as
-    })
-    .map((r) => r.name)
+  // Quien clavo el marcador EXACTO. En grupos los equipos son fijos, asi que
+  // basta comparar el marcador del partido. En ELIMINATORIA el cruce cambia por
+  // persona, asi que no alcanza con que coincida el marcador de su llave en esa
+  // posicion: hay que acertar el MISMO cruce (mismo par de equipos) y su
+  // marcador. Eso es justo el item knockoutMatch con status 'exact' del motor
+  // (su realMatchId apunta a esta llave real); asi nadie aparece por coincidir
+  // un 0-1 con otros equipos.
+  const clavaron = isKO
+    ? rows
+        .filter((r) =>
+          (r.items ?? []).some(
+            (it) =>
+              it.category === 'knockoutMatch' &&
+              it.realMatchId === id &&
+              it.status === 'exact',
+          ),
+        )
+        .map((r) => r.name)
+    : rows
+        .filter((r) => {
+          const p = r.prediction?.groupMatches?.[id]
+          return p && p.hs === real.hs && p.as === real.as
+        })
+        .map((r) => r.name)
 
   return {
     emoji: '🎯',
