@@ -295,6 +295,12 @@
       "away": "CAN",
       "hs": 0,
       "as": 1
+    },
+    "M76": {
+      "home": "BRA",
+      "away": "JPN",
+      "hs": 2,
+      "as": 1
     }
   },
   "champion": null,
