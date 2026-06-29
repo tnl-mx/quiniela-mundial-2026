@@ -499,6 +499,85 @@
   opacity: 0.7;
 }
 
+/* ---------- Eliminatoria: tarjetas de resultado real ---------- */
+.pd-kores {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+}
+@media (min-width: 620px) {
+  .pd-kores {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.pd-kores__card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+}
+.pd-kores__card.is-scored {
+  border-color: var(--color-brand);
+  background: var(--color-brand-tint);
+}
+.pd-kores__top {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+.pd-kores__team--away {
+  text-align: right;
+}
+.pd-kores__score {
+  font-variant-numeric: tabular-nums;
+}
+.pd-kores__adv {
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-brand-dark);
+  margin-top: 2px;
+}
+.pd-kores__lines {
+  margin-top: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.pd-kores__line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 0.78rem;
+}
+.pd-kores__ic {
+  font-weight: 800;
+  flex: none;
+}
+.pd-kores__line.is-hit .pd-kores__ic {
+  color: var(--color-success);
+}
+.pd-kores__line.is-miss {
+  color: var(--color-text-muted);
+}
+.pd-kores__line.is-miss .pd-kores__ic {
+  color: var(--color-text-subtle);
+}
+.pd-kores__txt {
+  flex: 1;
+}
+.pd-kores__plus {
+  flex: none;
+  font-weight: 800;
+  color: var(--color-brand-dark);
+}
+
 /* ---------- Banderita de demo ---------- */
 .pd-demo-flag {
   display: inline-block;

@@ -146,6 +146,88 @@ function MatchRow({ teams, home, away, predText, predPens, realText, points, pla
   )
 }
 
+// Ronda + a donde avanza el ganador, a partir del id de la llave (M73..M104).
+function koRoundInfo(id) {
+  const n = Number.parseInt(id.slice(1), 10)
+  if (n >= 73 && n <= 88) return { label: 'Ronda de 32', advanceKey: 'r16', order: 0 }
+  if (n >= 89 && n <= 96) return { label: 'Octavos', advanceKey: 'qf', order: 1 }
+  if (n >= 97 && n <= 100) return { label: 'Cuartos', advanceKey: 'sf', order: 2 }
+  if (n >= 101 && n <= 102) return { label: 'Semifinales', advanceKey: 'final', order: 3 }
+  if (n === 103) return { label: 'Tercer lugar', advanceKey: null, order: 4 }
+  if (n === 104) return { label: 'Final', advanceKey: null, order: 5 }
+  return { label: 'Eliminatoria', advanceKey: null, order: 9 }
+}
+
+// Equipo que gano una llave real (tiempo regular o penales), o null.
+function koWinner(k) {
+  if (!k || !Number.isFinite(k.hs) || !Number.isFinite(k.as)) return null
+  if (k.hs > k.as) return k.home
+  if (k.hs < k.as) return k.away
+  if (k.pens?.went && Number.isFinite(k.pens.hs) && Number.isFinite(k.pens.as) && k.pens.hs !== k.pens.as) {
+    return k.pens.hs > k.pens.as ? k.home : k.away
+  }
+  return null
+}
+
+// Tarjeta de un partido REAL de eliminatoria: el resultado oficial + como le
+// fue a la persona en DOS frentes claros: (1) el CRUCE (predijo ese mismo par
+// de equipos y su marcador/ganador) y (2) el CLASIFICADO (tenia al equipo que
+// avanzo). Cada frente muestra sus puntos. Sirve igual en todas las rondas.
+function KoResultCard({ teams, card }) {
+  const flag = (c) => teams[c]?.flag ?? '🏳'
+  const { info, k, winner, matchItem, advItem, matchPts, advPts } = card
+  const cruceHit = !!matchItem
+  const advHit = !!advItem
+  const realPens =
+    k.pens?.went && Number.isFinite(k.pens.hs) && Number.isFinite(k.pens.as)
+      ? ` · pen ${k.pens.hs}-${k.pens.as}`
+      : ''
+  const statusText = !matchItem
+    ? ''
+    : matchItem.status === 'exact'
+      ? 'marcador exacto'
+      : matchItem.status === 'outcome'
+        ? 'acertaste al ganador'
+        : 'fallaste el marcador'
+  const total = matchPts + advPts
+  return (
+    <div className={`pd-kores__card ${total > 0 ? 'is-scored' : ''}`}>
+      <div className="pd-kores__top">
+        <span className="pd-kores__team">{flag(k.home)} {k.home}</span>
+        <strong className="pd-kores__score">{k.hs}–{k.as}{realPens}</strong>
+        <span className="pd-kores__team pd-kores__team--away">{k.away} {flag(k.away)}</span>
+      </div>
+      {winner && (
+        <div className="pd-kores__adv">{flag(winner)} {winner} avanza</div>
+      )}
+      <div className="pd-kores__lines">
+        <div className={`pd-kores__line ${cruceHit ? 'is-hit' : 'is-miss'}`}>
+          <span className="pd-kores__ic" aria-hidden="true">{cruceHit ? '✓' : '✗'}</span>
+          <span className="pd-kores__txt">
+            <strong>Cruce:</strong>{' '}
+            {cruceHit ? (
+              <>pusiste {matchItem.home} {matchItem.prediction.hs}-{matchItem.prediction.as} {matchItem.away} · {statusText}</>
+            ) : (
+              'no tenías este cruce'
+            )}
+          </span>
+          {matchPts > 0 && <span className="pd-kores__plus">+{matchPts}</span>}
+        </div>
+        {info.advanceKey && (
+          <div className={`pd-kores__line ${advHit ? 'is-hit' : 'is-miss'}`}>
+            <span className="pd-kores__ic" aria-hidden="true">{advHit ? '✓' : '✗'}</span>
+            <span className="pd-kores__txt">
+              <strong>Clasificado:</strong>{' '}
+              {advHit ? <>tenías a {winner} avanzando</> : <>no tenías a {winner} avanzando</>}
+            </span>
+            {advPts > 0 && <span className="pd-kores__plus">+{advPts}</span>}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ---------- Vista ----------
 
 export function PersonDetail({ row, position, tournament, teams, realResults, annexCOptions = [], demo = false, tournamentId, onBack }) {
@@ -182,6 +264,30 @@ export function PersonDetail({ row, position, tournament, teams, realResults, an
     if (ms.length) koByRound[label] = ms
   }
   const hasKnockout = Object.keys(koByRound).length > 0
+
+  // Resultados REALES de eliminatoria: una tarjeta por llave oficial ya jugada
+  // (cualquier ronda), con como le fue a la persona. Reusa los items del motor
+  // para que los puntos mostrados sean EXACTAMENTE los que suma. El cruce se
+  // empata por equipo (realMatchId del item), no por posicion del cuadro.
+  const koResults = useMemo(() => {
+    const ko = realResults?.knockout ?? {}
+    return Object.keys(ko)
+      .filter((id) => Number.isFinite(ko[id]?.hs) && Number.isFinite(ko[id]?.as))
+      .map((id) => {
+        const info = koRoundInfo(id)
+        const winner = koWinner(ko[id])
+        const matchItem = items.find((i) => i.category === 'knockoutMatch' && i.realMatchId === id)
+        const pensItem = items.find((i) => i.category === 'penalties' && i.realMatchId === id)
+        const x2Item = items.find((i) => i.category === 'multiplierBonus' && i.realMatchId === id)
+        const advItem = info.advanceKey
+          ? items.find((i) => i.category === 'knockoutAdvance' && i.team === winner && i.round === info.advanceKey)
+          : null
+        const matchPts = (matchItem?.points || 0) + (pensItem?.points || 0) + (x2Item?.points || 0)
+        const advPts = advItem?.points || 0
+        return { id, info, k: ko[id], winner, matchItem, advItem, matchPts, advPts }
+      })
+      .sort((a, b) => a.info.order - b.info.order || a.id.localeCompare(b.id))
+  }, [items, realResults])
 
   // ----- Posicionar el scroll al ABRIR la quiniela (una vez por persona) -----
   // Prioridad: 1) si hay memoria y NO entro un resultado nuevo desde entonces,
@@ -366,9 +472,35 @@ export function PersonDetail({ row, position, tournament, teams, realResults, an
         })}
       </section>
 
-      {/* ===== FASE ELIMINATORIA ===== */}
+      {/* ===== ELIMINATORIA: RESULTADOS REALES ===== */}
+      {koResults.length > 0 && (
+        <section className="pd-section">
+          <h2 className="pd-section__title">Eliminatoria · resultados</h2>
+          <p className="pd-muted">
+            Por cada partido real: si acertaste el <strong>cruce</strong> (mismo par de
+            equipos) y su marcador o ganador, y si tenías al equipo que <strong>clasificó</strong>.
+            Ahí ves de dónde salen tus puntos.
+          </p>
+          {ROUND_ORDER.map((label) => {
+            const cards = koResults.filter((c) => c.info.label === label)
+            if (cards.length === 0) return null
+            return (
+              <div className="pd-block" key={label}>
+                <h3 className="pd-block__title">{label}</h3>
+                <div className="pd-kores">
+                  {cards.map((c) => (
+                    <KoResultCard key={c.id} teams={teams} card={c} />
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+        </section>
+      )}
+
+      {/* ===== TU CUADRO PRONOSTICADO ===== */}
       <section className="pd-section">
-        <h2 className="pd-section__title">Fase eliminatoria</h2>
+        <h2 className="pd-section__title">Tu cuadro pronosticado</h2>
         {!hasKnockout ? (
           <p className="pd-muted">
             Sin pronóstico de eliminatoria todavía (o la fase aún no comienza).
