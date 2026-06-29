@@ -241,7 +241,8 @@
 /* Resalte temporal del partido mas reciente al abrir la quiniela (Parte 3).
    Late dos veces en verde fuerte y aterriza en el verde suave de los oficiales
    (verde, no rojo/magenta, para que no se lea como "error"). */
-.pd-match--latest {
+.pd-match--latest,
+.pd-kores__card--latest {
   animation: pd-latest-pulse 1.9s ease-out;
 }
 @keyframes pd-latest-pulse {

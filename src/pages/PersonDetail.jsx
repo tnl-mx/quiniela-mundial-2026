@@ -191,7 +191,7 @@ function KoResultCard({ teams, card }) {
         : 'fallaste el marcador'
   const total = matchPts + advPts
   return (
-    <div className={`pd-kores__card ${total > 0 ? 'is-scored' : ''}`}>
+    <div className={`pd-kores__card ${total > 0 ? 'is-scored' : ''}`} data-real-match-id={card.id}>
       <div className="pd-kores__top">
         <span className="pd-kores__team">{flag(k.home)} {k.home}</span>
         <strong className="pd-kores__score">{k.hs}–{k.as}{realPens}</strong>
@@ -311,11 +311,21 @@ export function PersonDetail({ row, position, tournament, teams, realResults, an
         return
       }
       if (currentLatest) {
-        const el = document.querySelector(`[data-match-id="${currentLatest}"]`)
+        // En ELIMINATORIA llevamos al efecto a la tarjeta de RESULTADO REAL de
+        // esa llave (igual para todos), no a la llave PREDICHA de la persona
+        // (que confunde si no predijo ese cruce). En grupos, a la fila del
+        // partido como siempre.
+        const isKO = currentLatest.startsWith('M')
+        const el =
+          (isKO && document.querySelector(`[data-real-match-id="${currentLatest}"]`)) ||
+          document.querySelector(`[data-match-id="${currentLatest}"]`)
         if (el) {
+          const pulse = el.classList.contains('pd-kores__card')
+            ? 'pd-kores__card--latest'
+            : 'pd-match--latest'
           el.scrollIntoView({ block: 'center', behavior: 'auto' })
-          el.classList.add('pd-match--latest')
-          setTimeout(() => el.classList.remove('pd-match--latest'), 2100)
+          el.classList.add(pulse)
+          setTimeout(() => el.classList.remove(pulse), 2100)
           return
         }
       }
