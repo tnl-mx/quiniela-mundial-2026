@@ -163,3 +163,4 @@ scripts/generar-demo.js
 reporte-*.html
 
 src/logic/.tmp_*
+reporte-*.txt
