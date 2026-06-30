@@ -40,7 +40,7 @@ function allBracketMatches(bracket) {
   ]
 }
 
-export function buildRealResultsJson({ draft, bracket }) {
+export function buildRealResultsJson({ draft, bracket, lastMatchId = null }) {
   // --- Fase de grupos: copiamos los marcadores capturados validos ---
   const groupMatches = {}
   for (const [id, s] of Object.entries(draft.groupMatches ?? {})) {
@@ -67,10 +67,17 @@ export function buildRealResultsJson({ draft, bracket }) {
     knockout[m.id] = entry
   }
 
-  return {
+  const out = {
     groupMatches,
     knockout,
     champion: bracket.champion ?? null,
     awards: {},
   }
+  // Marca la ultima llave/partido capturado, pero SOLO si sigue presente en el
+  // archivo (no fue limpiada ni quedo stale). Asi el front resalta el resultado
+  // mas reciente sin depender del orden de las claves.
+  if (lastMatchId && (groupMatches[lastMatchId] || knockout[lastMatchId])) {
+    out.lastMatchId = lastMatchId
+  }
+  return out
 }

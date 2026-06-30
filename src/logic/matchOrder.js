@@ -89,6 +89,16 @@ export function maxPlayedMatch(realResults) {
 // subir, aunque se haya capturado fuera del orden cronologico. La eliminatoria
 // va despues de grupos en el tiempo, asi que tiene prioridad. null si nada.
 export function latestPlayedMatchId(realResults) {
+  // Si el archivo trae marca explicita de la ultima llave capturada (la pone el
+  // panel de admin), esa manda: el JSON guarda las claves ORDENADAS, asi que
+  // "la ultima clave" no es necesariamente la ultima que se metio.
+  const lm = realResults.lastMatchId
+  if (lm) {
+    if (isValidScore(realResults.knockout?.[lm])) return lm
+    if (isValidScore(realResults.groupMatches?.[lm])) return lm
+  }
+  // Fallback (archivos sin la marca): la ultima clave presente, eliminatoria
+  // antes que grupos.
   const ko = Object.keys(realResults.knockout ?? {}).filter((id) =>
     isValidScore(realResults.knockout[id]),
   )

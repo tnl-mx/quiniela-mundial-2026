@@ -31,7 +31,11 @@ Cuando reciba un mensaje del tipo "Catar vs Suiza quedo 1-0" o
    es el local.
 4. Editar UNICAMENTE `public/data/real-results.json`. Conservar todas las
    entradas existentes y solo agregar o actualizar la del partido en cuestion.
-   JSON valido, indentacion de 2 espacios, salto de linea final.
+   Ademas, fijar el campo de nivel superior `"lastMatchId"` al id del partido que
+   acabo de capturar (p. ej. `"lastMatchId": "M74"`): el front lo usa para
+   resaltar "el resultado mas reciente", y NO se puede inferir por el orden de
+   las claves (se guardan ordenadas). JSON valido, indentacion de 2 espacios,
+   salto de linea final.
 5. Hacer commit a `main` y push. NO correr el dev server ni el build. NO tocar
    ningun otro archivo, en especial nada bajo `.github/workflows/` (en sesiones
    en la nube ese tipo de cambio se rechaza y no es necesario aqui).
@@ -55,7 +59,8 @@ Cuando reciba un mensaje del tipo "Catar vs Suiza quedo 1-0" o
     }
   },
   "champion": null,
-  "awards": {}
+  "awards": {},
+  "lastMatchId": "M73"
 }
 ```
 
@@ -72,6 +77,9 @@ Reglas del esquema:
 - `champion`: codigo del campeon, solo despues de la final (`M104`). Antes va
   `null`.
 - `awards`: normalmente `{}`.
+- `lastMatchId`: id del ultimo partido capturado/actualizado (`A1`...`L6` o
+  `M73`...`M104`). Sirve para resaltar el resultado mas reciente; ponlo siempre
+  que agregues o cambies un marcador, con el id de ESE partido.
 - `groupTiebreaks` (opcional): objeto con clave = letra de grupo y valor = arreglo
   de 4 codigos en el orden final del grupo. Solo hace falta si un grupo termina
   empatado y el orden no se resuelve solo. No lo agregues a menos que sea

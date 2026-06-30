@@ -21,6 +21,10 @@ function emptyDraft() {
     knockout: {},
     groupTiebreaks: {},
     thirdPlaceTiebreaks: [],
+    // Ultima llave/partido que el organizador capturo o cambio. Sirve para
+    // resaltar "el resultado mas reciente" sin depender del orden de las claves
+    // (el JSON se guarda con las llaves ordenadas, no por orden de captura).
+    lastMatchId: null,
   }
 }
 
@@ -61,6 +65,7 @@ export function useRealResultsDraft() {
       const next = {
         ...d,
         groupMatches: { ...d.groupMatches, [matchId]: { hs, as } },
+        lastMatchId: matchId,
       }
       if (d.groupTiebreaks[group]) {
         const { [group]: _omit, ...rest } = d.groupTiebreaks
@@ -75,7 +80,11 @@ export function useRealResultsDraft() {
     setDraft((d) => {
       if (!d.groupMatches[matchId]) return d
       const { [matchId]: _omit, ...rest } = d.groupMatches
-      return { ...d, groupMatches: rest }
+      return {
+        ...d,
+        groupMatches: rest,
+        lastMatchId: d.lastMatchId === matchId ? null : d.lastMatchId,
+      }
     })
   }, [])
 
@@ -98,7 +107,7 @@ export function useRealResultsDraft() {
       const existing = d.knockout[matchId] ?? {}
       const next = { ...existing, home, away, hs, as }
       if (hs !== as && next.pens) delete next.pens
-      return { ...d, knockout: { ...d.knockout, [matchId]: next } }
+      return { ...d, knockout: { ...d.knockout, [matchId]: next }, lastMatchId: matchId }
     })
   }, [])
 
@@ -112,6 +121,7 @@ export function useRealResultsDraft() {
           ...d.knockout,
           [matchId]: { ...existing, pens: { went: true, hs: pHs, as: pAs } },
         },
+        lastMatchId: matchId,
       }
     })
   }, [])
@@ -121,7 +131,11 @@ export function useRealResultsDraft() {
     setDraft((d) => {
       if (!d.knockout[matchId]) return d
       const { [matchId]: _omit, ...rest } = d.knockout
-      return { ...d, knockout: rest }
+      return {
+        ...d,
+        knockout: rest,
+        lastMatchId: d.lastMatchId === matchId ? null : d.lastMatchId,
+      }
     })
   }, [])
 

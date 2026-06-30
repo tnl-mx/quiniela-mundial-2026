@@ -140,4 +140,28 @@ describe('latestPlayedMatchId (ultimo capturado, no el de mayor numero)', () => 
   it('null si no hay nada jugado', () => {
     expect(latestPlayedMatchId({ groupMatches: {}, knockout: {} })).toBeNull()
   })
+
+  it('respeta lastMatchId cuando viene (las claves se guardan ordenadas)', () => {
+    // Las claves quedan ordenadas (M73, M74, M76) aunque M74 se metio al final.
+    const rr = {
+      groupMatches: {},
+      knockout: {
+        M73: { home: 'RSA', away: 'CAN', hs: 0, as: 1 },
+        M74: { home: 'GER', away: 'PAR', hs: 1, as: 1, pens: { went: true, hs: 3, as: 4 } },
+        M76: { home: 'BRA', away: 'JPN', hs: 2, as: 1 },
+      },
+      lastMatchId: 'M74',
+    }
+    // Sin la marca devolveria M76 (ultima clave); con ella, M74.
+    expect(latestPlayedMatchId(rr)).toBe('M74')
+  })
+
+  it('ignora lastMatchId si apunta a un partido sin marcador valido (fallback)', () => {
+    const rr = {
+      groupMatches: {},
+      knockout: { M73: { home: 'RSA', away: 'CAN', hs: 0, as: 1 } },
+      lastMatchId: 'M99', // no existe / sin marcador
+    }
+    expect(latestPlayedMatchId(rr)).toBe('M73')
+  })
 })

@@ -390,7 +390,9 @@ export function AdminPanel() {
   }
 
   // --- JSON oficial (oficial + mis cambios) ---
-  const json = buildRealResultsJson({ draft: effective, bracket })
+  // Pasamos lastMatchId (ultima llave que toco el organizador) para que el front
+  // resalte el resultado mas reciente sin depender del orden de las claves.
+  const json = buildRealResultsJson({ draft: effective, bracket, lastMatchId: draft.lastMatchId })
   const jsonText = JSON.stringify(json, null, 2)
 
   const download = () => {
