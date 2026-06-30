@@ -323,9 +323,15 @@
       "away": "JPN",
       "hs": 2,
       "as": 1
+    },
+    "M78": {
+      "home": "CIV",
+      "away": "NOR",
+      "hs": 1,
+      "as": 2
     }
   },
   "champion": null,
   "awards": {},
-  "lastMatchId": "M75"
+  "lastMatchId": "M78"
 }
