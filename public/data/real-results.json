@@ -307,6 +307,17 @@
         "as": 4
       }
     },
+    "M75": {
+      "home": "NED",
+      "away": "MAR",
+      "hs": 1,
+      "as": 1,
+      "pens": {
+        "went": true,
+        "hs": 2,
+        "as": 3
+      }
+    },
     "M76": {
       "home": "BRA",
       "away": "JPN",
@@ -316,5 +327,5 @@
   },
   "champion": null,
   "awards": {},
-  "lastMatchId": "M74"
+  "lastMatchId": "M75"
 }
