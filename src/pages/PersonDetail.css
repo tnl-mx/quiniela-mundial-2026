@@ -241,9 +241,15 @@
 /* Resalte temporal del partido mas reciente al abrir la quiniela (Parte 3).
    Late dos veces en verde fuerte y aterriza en el verde suave de los oficiales
    (verde, no rojo/magenta, para que no se lea como "error"). */
+/* Pulso de "resultado nuevo". En grupos siempre verde. En las tarjetas de
+   eliminatoria: VERDE si la persona saco puntos en ese partido (is-scored), o
+   GRIS si no saco (igual te avisa que es nuevo, pero sin sugerir que acertaste). */
 .pd-match--latest,
-.pd-kores__card--latest {
+.pd-kores__card--latest.is-scored {
   animation: pd-latest-pulse 1.9s ease-out;
+}
+.pd-kores__card--latest:not(.is-scored) {
+  animation: pd-latest-pulse-neutral 1.9s ease-out;
 }
 @keyframes pd-latest-pulse {
   0% {
@@ -265,6 +271,28 @@
   100% {
     background: rgba(14, 122, 79, 0.12);
     box-shadow: inset 3px 0 0 var(--color-brand);
+  }
+}
+@keyframes pd-latest-pulse-neutral {
+  0% {
+    background: rgba(100, 116, 139, 0.42);
+    box-shadow: inset 4px 0 0 var(--color-border-strong);
+  }
+  20% {
+    background: rgba(100, 116, 139, 0.12);
+    box-shadow: inset 4px 0 0 var(--color-border-strong);
+  }
+  45% {
+    background: rgba(100, 116, 139, 0.42);
+    box-shadow: inset 4px 0 0 var(--color-border-strong);
+  }
+  70% {
+    background: rgba(100, 116, 139, 0.12);
+    box-shadow: inset 4px 0 0 var(--color-border-strong);
+  }
+  100% {
+    background: transparent;
+    box-shadow: inset 3px 0 0 var(--color-border-strong);
   }
 }
 
