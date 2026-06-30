@@ -606,6 +606,20 @@
   font-weight: 800;
   color: var(--color-brand-dark);
 }
+.pd-kores__total {
+  margin-top: 6px;
+  padding-top: 5px;
+  border-top: 1px dashed var(--color-border);
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  text-align: right;
+}
+.pd-kores__card.is-scored .pd-kores__total {
+  color: var(--color-brand-dark);
+}
+.pd-kores__total strong {
+  font-weight: 800;
+}
 
 /* ---------- Banderita de demo ---------- */
 .pd-demo-flag {

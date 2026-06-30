@@ -224,6 +224,13 @@ function KoResultCard({ teams, card }) {
           </div>
         )}
       </div>
+      <div className="pd-kores__total">
+        {total > 0 ? (
+          <>Sumaste <strong>+{total}</strong> en este partido</>
+        ) : (
+          'Sin puntos en este partido'
+        )}
+      </div>
     </div>
   )
 }
