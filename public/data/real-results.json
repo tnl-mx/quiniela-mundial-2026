@@ -341,9 +341,21 @@
       "away": "ECU",
       "hs": 2,
       "as": 0
+    },
+    "M80": {
+      "home": "ENG",
+      "away": "COD",
+      "hs": 2,
+      "as": 1
+    },
+    "M82": {
+      "home": "BEL",
+      "away": "SEN",
+      "hs": 3,
+      "as": 2
     }
   },
   "champion": null,
   "awards": {},
-  "lastMatchId": "M79"
+  "lastMatchId": "M82"
 }
