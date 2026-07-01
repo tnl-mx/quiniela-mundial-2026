@@ -335,9 +335,15 @@
       "away": "NOR",
       "hs": 1,
       "as": 2
+    },
+    "M79": {
+      "home": "MEX",
+      "away": "ECU",
+      "hs": 2,
+      "as": 0
     }
   },
   "champion": null,
   "awards": {},
-  "lastMatchId": "M77"
+  "lastMatchId": "M79"
 }
