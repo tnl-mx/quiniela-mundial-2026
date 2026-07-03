@@ -377,9 +377,20 @@
       "away": "ALG",
       "hs": 2,
       "as": 0
+    },
+    "M88": {
+      "home": "AUS",
+      "away": "EGY",
+      "hs": 1,
+      "as": 1,
+      "pens": {
+        "went": true,
+        "hs": 2,
+        "as": 4
+      }
     }
   },
   "champion": null,
   "awards": {},
-  "lastMatchId": "M85"
+  "lastMatchId": "M88"
 }
