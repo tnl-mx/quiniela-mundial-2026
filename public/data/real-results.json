@@ -371,9 +371,15 @@
       "away": "AUT",
       "hs": 3,
       "as": 0
+    },
+    "M85": {
+      "home": "SUI",
+      "away": "ALG",
+      "hs": 2,
+      "as": 0
     }
   },
   "champion": null,
   "awards": {},
-  "lastMatchId": "M83"
+  "lastMatchId": "M85"
 }
