@@ -384,6 +384,12 @@
       "hs": 3,
       "as": 2
     },
+    "M87": {
+      "home": "COL",
+      "away": "GHA",
+      "hs": 1,
+      "as": 0
+    },
     "M88": {
       "home": "AUS",
       "away": "EGY",
@@ -398,5 +404,5 @@
   },
   "champion": null,
   "awards": {},
-  "lastMatchId": "M86"
+  "lastMatchId": "M87"
 }
