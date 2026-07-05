@@ -412,9 +412,15 @@
       "away": "MAR",
       "hs": 0,
       "as": 3
+    },
+    "M91": {
+      "home": "BRA",
+      "away": "NOR",
+      "hs": 0,
+      "as": 2
     }
   },
   "champion": null,
   "awards": {},
-  "lastMatchId": "M89"
+  "lastMatchId": "M91"
 }
