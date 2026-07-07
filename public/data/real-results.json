@@ -436,9 +436,26 @@
       "away": "BEL",
       "hs": 1,
       "as": 4
+    },
+    "M95": {
+      "home": "ARG",
+      "away": "EGY",
+      "hs": 3,
+      "as": 2
+    },
+    "M96": {
+      "home": "SUI",
+      "away": "COL",
+      "hs": 0,
+      "as": 0,
+      "pens": {
+        "went": true,
+        "hs": 4,
+        "as": 3
+      }
     }
   },
   "champion": null,
   "awards": {},
-  "lastMatchId": "M94"
+  "lastMatchId": "M96"
 }
