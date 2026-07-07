@@ -430,9 +430,15 @@
       "away": "ESP",
       "hs": 0,
       "as": 1
+    },
+    "M94": {
+      "home": "USA",
+      "away": "BEL",
+      "hs": 1,
+      "as": 4
     }
   },
   "champion": null,
   "awards": {},
-  "lastMatchId": "M93"
+  "lastMatchId": "M94"
 }
