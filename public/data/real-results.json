@@ -453,9 +453,15 @@
         "hs": 4,
         "as": 3
       }
+    },
+    "M97": {
+      "home": "FRA",
+      "away": "MAR",
+      "hs": 2,
+      "as": 0
     }
   },
   "champion": null,
   "awards": {},
-  "lastMatchId": "M96"
+  "lastMatchId": "M97"
 }
