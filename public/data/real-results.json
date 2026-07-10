@@ -459,9 +459,15 @@
       "away": "MAR",
       "hs": 2,
       "as": 0
+    },
+    "M98": {
+      "home": "ESP",
+      "away": "BEL",
+      "hs": 2,
+      "as": 1
     }
   },
   "champion": null,
   "awards": {},
-  "lastMatchId": "M97"
+  "lastMatchId": "M98"
 }
