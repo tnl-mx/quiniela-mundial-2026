@@ -465,9 +465,15 @@
       "away": "BEL",
       "hs": 2,
       "as": 1
+    },
+    "M99": {
+      "home": "NOR",
+      "away": "ENG",
+      "hs": 1,
+      "as": 2
     }
   },
   "champion": null,
   "awards": {},
-  "lastMatchId": "M98"
+  "lastMatchId": "M99"
 }
