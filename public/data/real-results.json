@@ -495,9 +495,15 @@
       "away": "ENG",
       "hs": 4,
       "as": 6
+    },
+    "M104": {
+      "home": "ESP",
+      "away": "ARG",
+      "hs": 1,
+      "as": 0
     }
   },
-  "champion": null,
+  "champion": "ESP",
   "awards": {},
-  "lastMatchId": "M103"
+  "lastMatchId": "M104"
 }
