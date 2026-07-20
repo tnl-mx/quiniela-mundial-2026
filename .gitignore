@@ -164,3 +164,4 @@ reporte-*.html
 
 src/logic/.tmp_*
 reporte-*.txt
+reporte-*.pdf
